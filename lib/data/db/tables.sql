@@ -1,21 +1,21 @@
-DROP DATABASE IF EXISTS task_manager
+DROP DATABASE IF EXISTS task_manager;
 CREATE DATABASE task_manager;
 use task_manager;
 CREATE TABLE projects (
-    id INT PRIMARY KEY,
+    id varchar(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tasks (
-    id INT PRIMARY KEY,
+    id varchar(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     category VARCHAR(255),
-    project_id INT NOT NULL,
+    project_id varchar(255) NOT NULL,
     time_in_millis BIGINT NULL DEFAULT NULL ,
     status VARCHAR(255) NOT NULL DEFAULT "PENDING",
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id) on delete no action;
+    FOREIGN KEY (project_id) REFERENCES projects(id)
 );

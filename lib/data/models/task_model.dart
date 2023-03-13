@@ -1,16 +1,16 @@
 
 class Task {
-  final int id;
+  final String id;
   final String name;
   final String category;
-  final int projectId;
+  final String projectId;
   final int? timeInMillis;
   final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   Task({
-    this.id = -1,
+    required this.id,
     required this.name,
     required this.category,
     required this.projectId,
@@ -21,10 +21,10 @@ class Task {
   });
 
    Task copyWith({
-    int? id,
+    String? id,
     String? name,
     String? category,
-    int? projectId,
+    String? projectId,
     int? timeInMillis,
     String? status,
     DateTime? createdAt,

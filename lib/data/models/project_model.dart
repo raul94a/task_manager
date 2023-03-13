@@ -1,18 +1,18 @@
 class Project {
-  final int id;
+  final String id;
   final String name;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   Project({
-    this.id = -1,
+    required this.id,
     required this.name,
     required this.createdAt,
     required this.updatedAt,
   });
   
   Project copyWith({
-    int? id,
+    String? id,
     String? name,
     DateTime? createdAt,
     DateTime? updatedAt,

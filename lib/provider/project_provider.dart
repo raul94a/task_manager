@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/data/models/project_model.dart';
-import 'package:task_manager/data/models/task_model.dart';
 
 final projectStateNotifierProvider =
     StateNotifierProvider((ref) => ref.read(projectsState.notifier));

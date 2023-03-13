@@ -9,6 +9,8 @@ class MainOptionBloc {
   changeOption({required MainOption option}){
     final notifier = ref.read(mainOptionState.notifier);
     notifier.update((state) => state.copyWith(selectedOptionFromMainMenu: option));
+
+    print('Main option changed to ${option.value}');
   }
 
 }

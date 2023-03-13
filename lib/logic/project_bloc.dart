@@ -11,21 +11,20 @@ class ProjectBloc {
   final ProjectRepository repository = ProjectRepository();
   ProjectBloc({required this.ref, required this.context});
 
-  Future<void> getProjects() async {
+  Future<List<Project>> getProjects() async {
     print('Triggering getProjects');
     //empezamos cambiando el state a loading... envuelvo al resto en un Future.delayed
     //para que se vea bien la actualización del estado
-    ref.read(projectsState.notifier).update(
-          (state) => state.copyWith(isLoading: true),
-        );
+   
 
-    final notifier = ref.read(projectsState.notifier);
+    final notifier = ref.read(projectsState);
     try {
       final projects = await repository.getAll();
-      notifier.update((state) =>
-          state.copyWith(projects: projects, isError: false, isLoading: false));
+      notifier.projects = [...projects];
+      return projects;
     } catch (ex) {
-      notifier.update((state) => state.copyWith(isError: true));
+      
+      rethrow;
     }
   }
 
@@ -33,8 +32,6 @@ class ProjectBloc {
     final notifier = ref.read(projectsState.notifier);
 
     notifier.update((state) => state.copyWith(isError: false, isLoading: true));
-
- 
 
     try {
       final id = const Uuid().v4();

@@ -1,30 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql_manager/mysql_manager.dart';
+import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/project_bloc.dart';
+import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
+import 'package:task_manager/views/app.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Init db connection
-  MySQLManager.instance.init();
-  runApp(const ProviderScope(child: MainApp()));
+  bool error = false;
+  try {
+    await MySQLManager.instance.init();
+  } catch (exception) {
+    print('Error estableciendo la conexión con la base de datos');
+    bool error = true;
+  }
+  runApp(ProviderScope(child: MainApp(error: error)));
 }
 
 class MainApp extends ConsumerWidget {
-  const MainApp({super.key});
+  const MainApp({super.key, required this.error});
+  final bool error;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('Error: $error');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(),
-      home: const Scaffold(
+      home: Scaffold(
         body: Center(
-          child: ProjectForm(),
+          child: Visibility(
+              replacement: Center(
+                child: Column(
+                  children: [
+                    const Text('Ha ocurrido un error'),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.error,
+                          color: Colors.red,
+                          size: 50,
+                        )),
+                  ],
+                ),
+              ),
+              visible: !error,
+              child: const InitApp()),
         ),
       ),
     );
+  }
+}
+
+class InitApp extends ConsumerStatefulWidget {
+  const InitApp({super.key});
+
+  @override
+  ConsumerState<InitApp> createState() => _InitAppState();
+}
+
+class _InitAppState extends ConsumerState<InitApp> {
+  bool error = false;
+  void _fetchProjects() {
+    final projectBloc = ProjectBloc(ref: ref, context: context);
+    try {
+      projectBloc.getProjects().catchError((err, stack) async {
+        setState(() {
+          error = true;
+        });
+        return <Project>[];
+      }).then((projects) {
+        if (projects.isNotEmpty) {
+          print(projects);
+          final project = projects.first;
+          final taskBloc = TasksProjectBloc(ref: ref);
+          taskBloc.setProjectId(project.id);
+          taskBloc.getByProject().then((_) {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const App()));
+          });
+        }
+      });
+    } catch (ex) {
+      print('HA OCURRIDO UNA EXP');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _fetchProjects();
+    } catch (ex) {
+      print('ha ocurrido una expceiton $ex');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (error) {
+      return Center(
+        child: Column(
+          children: [
+            const Text('Ha ocurrido un error'),
+            IconButton(
+                onPressed: () {
+                  main();
+                },
+                icon: const Icon(
+                  Icons.error,
+                  color: Colors.red,
+                  size: 50,
+                )),
+          ],
+        ),
+      );
+    }
+    return const CircularProgressIndicator();
   }
 }
 

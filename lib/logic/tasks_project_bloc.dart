@@ -10,6 +10,25 @@ class TasksProjectBloc {
   final WidgetRef ref;
   final taskRepository = TaskRepository();
 
+  void setProjectId(String projectId) {
+    final notifier = ref.read(tasksProjectState);
+    notifier.projectId = projectId; 
+  }
+  Future<void> loadTasks() async {
+    final notifier = ref.read(tasksProjectState);
+   
+
+    try {
+      final tasksDB =
+          await taskRepository.getAll(notifier.projectId ?? '');
+      notifier.tasks = [...tasksDB];
+    } catch (ex) {
+      rethrow;
+      // notifier.update((state) =>
+      //     state.copyWith(isError: true, isLoading: false, tasks: []));
+    }
+  }
+
   Future<void> getByProject() async {
     final notifier = ref.read(tasksProjectState.notifier);
     notifier.update((state) => state.copyWith(isError: false, isLoading: true));

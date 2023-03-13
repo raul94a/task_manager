@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class Project {
   final String id;
   final String name;
@@ -38,4 +39,9 @@ class Project {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
       };
+
+  @override
+  String toString() {
+    return 'Project(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
 }

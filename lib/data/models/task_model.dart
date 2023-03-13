@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class Task {
   final String id;
@@ -63,4 +64,9 @@ class Task {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
       };
+
+  @override
+  String toString() {
+    return 'Task(id: $id, name: $name, category: $category, projectId: $projectId, timeInMillis: $timeInMillis, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
 }

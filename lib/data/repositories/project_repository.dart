@@ -3,12 +3,21 @@ import 'package:task_manager/data/models/project_model.dart';
 
 class ProjectRepository {
   Future<Project> create(Project project) async {
+    print('On create project...');
     final connection = MySQLManager.instance.conn!;
-    final row = (await connection
-        .execute('INSERT INTO projects(name) VALUES(${project.name})'));
-    print(row.rows.toList());
+    try{
+
+    final preparedStatement = (await connection
+        .prepare('INSERT INTO projects(id,name) VALUES(?,?)'));
+        await preparedStatement.execute([project.id, project.name]);
+        await preparedStatement.deallocate();
+    
 
     return project;
+    }catch(ex){
+      print(ex);
+      rethrow;
+    }
   }
 
   Future<List<Project>> getAll() async {

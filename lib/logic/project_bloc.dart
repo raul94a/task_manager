@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/data/repositories/project_repository.dart';
 import 'package:task_manager/provider/project_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ProjectBloc {
   final WidgetRef ref;
@@ -28,13 +29,21 @@ class ProjectBloc {
     }
   }
 
-  Future<void> createProject(Project project) async {
+  Future<void> createProject(String name) async {
     final notifier = ref.read(projectsState.notifier);
 
+    notifier.update((state) => state.copyWith(isError: false, isLoading: true));
+
+ 
+
     try {
-      final createdProject = await repository.create(project);
+      final id = const Uuid().v4();
+      final date = DateTime.now();
+      final project =
+          Project(id: id, name: name, createdAt: date, updatedAt: date);
+      await repository.create(project);
       final projects = notifier.state.projects;
-      projects.add(createdProject);
+      projects.add(project);
       notifier.update((state) => state
           .copyWith(projects: [...projects], isError: false, isLoading: false));
     } catch (ex) {

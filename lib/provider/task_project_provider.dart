@@ -20,14 +20,16 @@ class TaskProjectStateProvider {
   bool isLoading;
   bool isError;
   String? projectId;
-  List<Task> tasks;
+  List<Task> tasks = [];
 
   TaskProjectStateProvider({
     this.isError = false,
-    this.tasks = const [],
+    List<Task>? tasks,
     this.projectId,
     this.isLoading = false,
-  });
+  }){
+    this.tasks = tasks ?? [];
+  }
 
   TaskProjectStateProvider copyWith(
       {bool? isLoading, bool? isError, List<Task>? tasks, String? projectId}) {

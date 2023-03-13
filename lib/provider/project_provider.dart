@@ -19,13 +19,15 @@ final projectsState = StateProvider(((ref) {
 class ProjectStateProvider {
   bool isLoading;
   bool isError;
-  List<Project> projects;
+  List<Project> projects = [];
 
   ProjectStateProvider({
     this.isError = false,
-    this.projects = const [],
+    List<Project>? projects,
     this.isLoading = false,
-  });
+  }) {
+    this.projects = projects ?? [];
+  }
 
   ProjectStateProvider copyWith(
       {bool? isLoading, bool? isError, List<Project>? projects}) {

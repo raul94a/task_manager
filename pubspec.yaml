@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   mysql_manager: ^1.1.0
+  uuid: ^3.0.7
   flutter_riverpod:
   flutter:
     sdk: flutter

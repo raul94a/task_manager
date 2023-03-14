@@ -15,7 +15,7 @@ Future<void> main() async {
     await MySQLManager.instance.init();
   } catch (exception) {
     print('Error estableciendo la conexión con la base de datos');
-    bool error = true;
+     error = true;
   }
   runApp(ProviderScope(child: MainApp(error: error)));
 }

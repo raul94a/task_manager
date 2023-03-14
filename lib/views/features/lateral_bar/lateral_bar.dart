@@ -27,7 +27,7 @@ class LateralBar extends StatelessWidget {
             child: Container(
               height: height,
               color: Colors.blue,
-              child: const SecondaryAppOption(),
+              child:  SecondaryAppOption(secondaryContainerWidth: mainContainerWidth *0.6),
             ),
           )
         ],

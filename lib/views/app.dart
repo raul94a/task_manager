@@ -1,3 +1,4 @@
+import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -8,19 +9,22 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Row(
-            children: [
-              LateralBar(),
-              Expanded(
-                  child: Container(
-                color: Colors.pink,
-              ))
-            ],
-          )
-        ],
+    return ContextMenuOverlay(
+      
+      child: Scaffold(
+        body: Column(
+          children: [
+            Row(
+              children: [
+                LateralBar(),
+                Expanded(
+                    child: Container(
+                  color: Colors.pink,
+                ))
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

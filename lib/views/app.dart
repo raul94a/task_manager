@@ -1,8 +1,7 @@
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:task_manager/views/features/lateral_bar/lateral_bar.dart';
+import 'package:task_manager/views/features/project_page/project_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -10,18 +9,11 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ContextMenuOverlay(
-      
       child: Scaffold(
         body: Column(
           children: [
             Row(
-              children: [
-                LateralBar(),
-                Expanded(
-                    child: Container(
-                  color: Colors.pink,
-                ))
-              ],
+              children: [LateralBar(), Expanded(child: ProjectPage())],
             )
           ],
         ),

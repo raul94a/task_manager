@@ -51,6 +51,7 @@ class TasksProjectBloc {
   }
 
   Future<void> createTask({required Task task}) async {
+    print('Creating task');
     final notifier = ref.read(tasksProjectState.notifier);
     notifier.update((state) => state.copyWith(isError: false, isLoading: true));
 

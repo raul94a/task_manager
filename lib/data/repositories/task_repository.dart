@@ -4,11 +4,20 @@ import 'package:task_manager/data/models/task_model.dart';
 class TaskRepository {
   Future<Task> create(Task task) async {
     final connection = MySQLManager.instance.conn!;
-    final row = (await connection.execute(
-        'INSERT INTO projects(name,category,project_id) VALUES(${task.name}, ${task.category}, ${task.projectId} )'));
-    print(row.rows.toList());
-
-    return task;
+    try {
+      final prepareStatement = (await connection.prepare(
+        'INSERT INTO tasks(id, name,category,project_id) VALUES(?,?,?,?)',
+      
+      ));
+      final result = await prepareStatement.execute([task.id, task.name, task.category,task.projectId]);
+      await prepareStatement.deallocate();
+      
+      print(result.rows.toList());
+      return task;
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
     ;
   }
 

@@ -77,8 +77,8 @@ class _InitAppState extends ConsumerState<InitApp> {
           print(projects);
           final project = projects.first;
           final taskBloc = TasksProjectBloc(ref: ref);
-          taskBloc.setProjectId(project.id);
-          taskBloc.getByProject().then((_) {
+        
+          taskBloc.getByProject(project.id).then((_) {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const App()));
           });

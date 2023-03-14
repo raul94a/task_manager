@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'package:task_manager/views/features/lateral_bar/main_app_option.dart';
-import 'package:task_manager/views/features/lateral_bar/secondary_app_option.dart';
+import 'package:task_manager/views/features/lateral_bar/secondary_app_option/secondary_app_option.dart';
+import 'package:task_manager/views/features/lateral_bar/main_app_option/main_app_option.dart';
 
 class LateralBar extends StatelessWidget {
   const LateralBar({super.key});
@@ -16,6 +15,8 @@ class LateralBar extends StatelessWidget {
       height: height,
       width: mainContainerWidth,
       constraints: const BoxConstraints(minWidth: 250, maxWidth: 450),
+      decoration:
+          BoxDecoration(border: Border(right: BorderSide(color: Colors.black,width: 5.5))),
       child: Row(
         children: [
           SizedBox(
@@ -23,11 +24,11 @@ class LateralBar extends StatelessWidget {
             child: const MainAppOption(),
           ),
           Expanded(
-            
             child: Container(
               height: height,
-              color: Colors.blue,
-              child:  SecondaryAppOption(secondaryContainerWidth: mainContainerWidth *0.6),
+              color: Colors.white,
+              child: SecondaryAppOption(
+                  secondaryContainerWidth: mainContainerWidth * 0.6),
             ),
           )
         ],

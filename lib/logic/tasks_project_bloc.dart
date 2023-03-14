@@ -29,13 +29,14 @@ class TasksProjectBloc {
     }
   }
 
-  Future<void> getByProject() async {
+  Future<void> getByProject(String projectId) async {
     final notifier = ref.read(tasksProjectState.notifier);
-    notifier.update((state) => state.copyWith(isError: false, isLoading: true));
+    notifier.update((state) => state.copyWith(isError: false, isLoading: true,projectId: projectId));
 
     try {
       final tasksDB =
-          await taskRepository.getAll(notifier.state.projectId ?? '');
+          await taskRepository.getAll(projectId);
+          print(tasksDB);
       notifier.update((state) => state
           .copyWith(isError: false, isLoading: false, tasks: [...tasksDB]));
     } catch (ex) {
@@ -69,4 +70,13 @@ class TasksProjectBloc {
           state.copyWith(isError: true, isLoading: false, tasks: []));
     }
   }
+
+  void changeSelectedStatus({required TaskStatus status}){
+    final notifier = ref.read(tasksProjectState.notifier);
+    print(status);
+    notifier.update((state) => state.copyWith(selectedStatus: status,isError: false));
+    print('State changed ${notifier.state}');
+  }
+
+ 
 }

@@ -47,4 +47,6 @@ class ProjectBloc {
       notifier.update((state) => state.copyWith(isError: true));
     }
   }
+
+  
 }

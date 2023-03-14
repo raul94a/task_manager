@@ -38,6 +38,15 @@ class ProjectStateProvider {
     );
   }
 
+  Project getProjectById({required String projectId}) {
+    try {
+      final project = projects.firstWhere((element) => element.id == projectId);
+      return project;
+    } catch (ex) {
+      throw 'Error: no se ha encontrado el projecto con la id $projectId';
+    }
+  }
+
   @override
   String toString() {
     return 'AuthStateProvider(isLoading: $isLoading, isError: $isError, i)';

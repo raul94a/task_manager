@@ -158,7 +158,7 @@ class _ProjectFormState extends ConsumerState<ProjectForm> {
               ProjectBloc(ref: ref, context: context)
                   .createProject(controller.text);
             },
-            child: const Text('Crear projecto'))
+            child: const Text('Crear proyecto'))
       ],
     );
   }

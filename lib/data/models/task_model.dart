@@ -5,6 +5,7 @@ class Task {
   final String name;
   final String category;
   final String projectId;
+  final String description;
   final int? timeInMillis;
   final String status;
   final DateTime createdAt;
@@ -13,6 +14,7 @@ class Task {
   Task({
     required this.id,
     required this.name,
+    required this.description,
     required this.category,
     required this.projectId,
     this.timeInMillis,
@@ -21,11 +23,12 @@ class Task {
     required this.updatedAt,
   });
 
-   Task copyWith({
+  Task copyWith({
     String? id,
     String? name,
     String? category,
     String? projectId,
+    String? description,
     int? timeInMillis,
     String? status,
     DateTime? createdAt,
@@ -38,6 +41,7 @@ class Task {
       projectId: projectId ?? this.projectId,
       timeInMillis: timeInMillis ?? this.timeInMillis,
       status: status ?? this.status,
+      description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -45,6 +49,7 @@ class Task {
 
   factory Task.fromMap(Map<String, dynamic> map) => Task(
         id: map['id'],
+        description: map['description'] ?? '',
         name: map['name'],
         category: map['category'],
         projectId: map['project_id'],
@@ -57,6 +62,7 @@ class Task {
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,
+        'description': description,
         'category': category,
         'project_id': projectId,
         'time_in_millis': timeInMillis,
@@ -64,6 +70,8 @@ class Task {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
       };
+
+  int get seconds => timeInMillis == null ? 0 : timeInMillis! ~/ 1000;
 
   @override
   String toString() {

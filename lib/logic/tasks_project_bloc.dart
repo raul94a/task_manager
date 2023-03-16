@@ -71,6 +71,15 @@ class TasksProjectBloc {
     }
   }
 
+  void updateTask({required Task task}){
+    final state = ref.read(tasksProjectState);
+    final tasks = state.tasks;
+    final index = tasks.indexWhere((element) => element.id == task.id);
+    tasks[index] = task;
+    final notifier = ref.read(tasksProjectState.notifier);
+    notifier.update((state) => state.copyWith(tasks: [...tasks]));
+  }
+
   void changeSelectedStatus({required TaskStatus status}){
     final notifier = ref.read(tasksProjectState.notifier);
     print(status);

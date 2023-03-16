@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/mixins/material_state_property_mixin.dart';
 import 'package:task_manager/data/models/project_model.dart';
+import 'package:task_manager/data/models/task_model.dart';
+import 'package:task_manager/data/repositories/task_repository.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/views/features/lateral_bar/secondary_app_option/projects/create_new_project.dart';
+import 'package:uuid/uuid.dart';
 
 class ProjectsOption extends StatelessWidget {
   const ProjectsOption({
@@ -160,7 +163,18 @@ class _ContextMenuProjectTask extends StatelessWidget
                 style: ButtonStyle(
                   padding: getProperty(EdgeInsets.zero),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  final task = Task(
+                      id: const Uuid().v4(),
+                      name: 'Tarea ts',
+                      description:
+                          'Esta description essdfjladsñfjladsfjadslñfjlñadsjfladsñfjlsadflñjaslfdaskfas',
+                      category: 'Mobile Flutter',
+                      projectId: project.id,
+                      createdAt: DateTime.now(),
+                      updatedAt: DateTime.now());
+                  TaskRepository().create(task);
+                },
                 icon: const Icon(
                   Icons.add,
                   color: Colors.black,

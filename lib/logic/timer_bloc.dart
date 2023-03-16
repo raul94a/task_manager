@@ -14,35 +14,39 @@ class TimerBloc {
     final timeInMillis = task.timeInMillis;
     final checkMillis = timeInMillis == null ? 0 : task.timeInMillis;
     notifier.update((state) => state.copyWith(
-          task: task.copyWith(timeInMillis: checkMillis),
+          task: task,
         ));
   }
 
-  void startRun({required Stream<int> stream}) {
-    final state = ref.read(timerState);
-    final controller = state.controller;
-    print('StreamController paused: ${controller.isPaused}');
+  // void startRun({required Stream<int> stream}) {
+  //   final state = ref.read(timerState);
+  //   final controller = state.controller;
+  //   print('StreamController paused: ${controller.isPaused}');
 
-    final subscription = stream.listen((data) {
-      controller.sink.add(data);
-    });
-    subscription.resume();
-    
-    print('Subscribing stream');
-    print('StreamController paused: ${controller.isPaused}');
-    print('StreamController closed: ${controller.isClosed}');
-    print('Subscription is paused ?  ${subscription.isPaused}');
-    final notifier = ref.read(timerState.notifier);
-    notifier.update((state) => state.copyWithController(
-        timerRunning: true,
-        subscription: subscription,
-        controller: controller));
+  //   final subscription = stream.listen((data) {
+  //     //controller.sink.add(data);
+  //   });
+  //  // subscription.resume();
+
+  //   print('Subscribing stream');
+  //   print('StreamController paused: ${controller.isPaused}');
+  //   print('StreamController closed: ${controller.isClosed}');
+  //   print('Subscription is paused ?  ${subscription.isPaused}');
+  //   final notifier = ref.read(timerState.notifier);
+  //   notifier.update((state) => state.copyWith(
+  //       timerRunning: true,
+  //       subscription: subscription,
+  //       controller: controller));
+  // }
+  void startRun() {
+    ref
+        .read(timerState.notifier)
+        .update((state) => state.copyWith(timerRunning: true));
   }
 
   void pauseRun() {
     ref.read(timerState.notifier).update(
-          (state) => state.copyWith(
-              timerRunning: false, subscription: state.subscription?..pause()),
+          (state) => state.copyWith(timerRunning: false),
         );
   }
 
@@ -56,17 +60,17 @@ class TimerBloc {
         task: state.task?.copyWith(timeInMillis: seconds * 1000)));
   }
 
-  void cancelSubscription(){
+  void cancelSubscription() {
     final state = ref.read(timerState);
     state.disposeSubscription();
     state.controller.close();
-
   }
 
   void destroyTimer() {
     cancelSubscription();
     ref.read(timerState.notifier).update((state) => state.copyWithController(
-        timerRunning: false, controller: StreamController<int>.broadcast(), subscription: null));
-
+        timerRunning: false,
+        controller: StreamController<int>.broadcast(),
+        subscription: null));
   }
 }

@@ -1,0 +1,232 @@
+import 'dart:async';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_builder/responsive_builder.dart';
+import 'package:task_manager/core/extensions/seconds_to_timer_extension.dart';
+import 'package:task_manager/data/models/task_model.dart';
+import 'package:task_manager/data/repositories/task_repository.dart';
+import 'package:task_manager/logic/tasks_project_bloc.dart';
+import 'package:task_manager/logic/timer_bloc.dart';
+import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/timer_provider.dart';
+import 'package:task_manager/provider/update_task_time_provider.dart';
+
+class TaskTimer extends ConsumerStatefulWidget {
+  const TaskTimer({
+    super.key,
+  
+  });
+
+
+
+  @override
+  ConsumerState<TaskTimer> createState() => _TaskTimerState();
+}
+
+class _TaskTimerState extends ConsumerState<TaskTimer> {
+  late TimerStateProvider mTimerState = ref.read(timerState);
+  ValueNotifier<bool> startStreaming = ValueNotifier(false);
+  bool isCurrentTaskRunning = false;
+
+  late int secondsToStartStreaming;
+  final StreamController<int> controller = StreamController.broadcast();
+  StreamSubscription<int>? subscription;
+  changeStartStreamingStatus() {
+    startStreaming.value = !startStreaming.value;
+  }
+
+  @override
+  void initState() {
+    // if (!mTimerState.timerRunning) {
+    //   mTimerState.task = task;
+    // } else {
+    //   startStreaming.value = true;
+    // }
+    // if ((mTimerState.task != null && task != null) &&
+    //     mTimerState.task?.id == task!.id) {
+    //   isCurrentTaskRunning = true;
+    // }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // startStreaming.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    mTimerState = ref.watch(timerState);
+    Task? task = mTimerState.task;
+    print('tasks seconds: ${task?.seconds}');
+    if (task == null) {
+      return const Center();
+    }
+
+    final updatedTask = ref.read(updateTaskTimeState).task;
+    if(updatedTask != null && updatedTask.id == task.id){
+      task = task.copyWith(timeInMillis: updatedTask.timeInMillis);
+    }
+    secondsToStartStreaming = task.seconds;
+
+    final tasksProvider = ref.read(tasksProjectState);
+    final taskIndex =
+        tasksProvider.tasks.indexWhere((e) => e.id == task!.id);
+
+    print('Rebuildintg task timer');
+
+    return Container(
+        decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: Colors.black))),
+        width: 400,
+        height: 200,
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            const Icon(
+              Icons.timer,
+              color: Colors.black,
+              size: 90,
+            ),
+            
+              if (!mTimerState.timerRunning) 
+                AutoSizeText(
+                  task == null
+                      ? "00:00:00"
+                      : task!.seconds.toTimer(),
+                  minFontSize: 21,
+                )else
+              
+              StreamBuilder<int>(
+                  initialData: task!.seconds,
+                  stream: controller.stream,
+                  builder: (context, snapshot) {
+                    // print(snapshot);
+                    final data = snapshot.data;
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return AutoSizeText(
+                        data == null ? "00:00:00" : data.toTimer(),
+                        minFontSize: 21,
+                      );
+                    }
+                    if (data != null) {
+                      Future.microtask(() {
+                        final updateTaskNotifier =
+                            ref.read(updateTaskTimeState.notifier);
+                        updateTaskNotifier.update((state) => state.copyWith(
+                            task: task!
+                                .copyWith(timeInMillis: data * 1000)));
+
+                        print('Updating task: ${task!.name}');
+                        if (data % 10 == 0) {
+                          TaskRepository().update(task!);
+                        }
+                      });
+                    }
+
+                    return AutoSizeText(
+                      data == null ? "00:00:00" : data.toTimer(),
+                      minFontSize: 21,
+                    );
+                  
+            }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => onPressTimerButton(
+                        ref: ref,
+                        timerBloc: TimerBloc(ref: ref),
+                        tasksProvider: tasksProvider,
+                        taskIndex: taskIndex),
+                    icon: Consumer(builder: (context, ref, _) {
+                      final timerProvider = ref.watch(timerState);
+                      return Icon(
+                        timerProvider.timerRunning &&
+                                (task!.id == timerProvider.task!.id)
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        size: 50,
+                      );
+                    })),
+                Consumer(builder: (ctx, ref, _) {
+                  final timerProvider = ref.watch(timerState);
+                  if (timerProvider.timerRunning &&
+                      (task!.id == timerProvider.task!.id)) {
+                    return IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () async {
+                          await subscription?.cancel();
+                          subscription = null;
+                          final task = ref.read(updateTaskTimeState).task!;
+                          TasksProjectBloc(ref: ref).updateTask(task: task);
+                          TimerBloc(ref: ref).addSeconds(seconds: task.seconds);
+                          TimerBloc(ref: ref).pauseRun();
+                          TaskRepository().update(task);
+                        },
+                        icon: const Icon(
+                          Icons.stop,
+                          size: 50,
+                        ));
+                  }
+                  return const Center();
+                })
+              ],
+            )
+          ],
+        ));
+  }
+
+  onPressTimerButton({
+    required WidgetRef ref,
+    required TimerBloc timerBloc,
+    required TaskProjectStateProvider tasksProvider,
+    required int taskIndex,
+  }) {
+   
+    if (subscription != null && !subscription!.isPaused) {
+      subscription!.pause();
+      timerBloc.pauseRun();
+  
+
+      final task = ref.read(updateTaskTimeState).task!;
+      TaskRepository().update(task);
+    } else if (subscription != null && subscription!.isPaused) {
+      subscription!.resume();
+      timerBloc.startRun();
+    
+    } else {
+      startTimer();
+    }
+  }
+
+  Stream<int> getStream({required int from}) => Stream.periodic(
+      const Duration(seconds: 1), (sec) => from + sec);
+
+  Stream<int> get stream => controller.stream;
+
+  Sink<int> get sink => controller.sink;
+
+  void startTimer() {
+    subscription = getStream(from: secondsToStartStreaming).listen(
+      (sec) {
+        print('Seconds are: $sec');
+        controller.sink.add(sec);
+      },
+      onDone: () {
+        subscription = null;
+        print('On done');
+      },
+    );
+    TimerBloc(ref: ref).startRun();
+  }
+
+}

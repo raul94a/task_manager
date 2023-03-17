@@ -5,10 +5,7 @@ import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_project_info.dart';
 
 class TaskList extends StatelessWidget {
-  const TaskList({
-    required this.tasks,
-    required this.projectPageRef
-  });
+  const TaskList({required this.tasks, required this.projectPageRef});
   final WidgetRef projectPageRef;
   final List<Task> tasks;
 
@@ -35,7 +32,11 @@ class TaskList extends StatelessWidget {
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     final task = tasks[index];
-                    return ProjectTaskInfo(key: UniqueKey(), task: task,projectPageRef: projectPageRef,);
+                    return ProjectTaskInfo(
+                      key: UniqueKey(),
+                      task: task,
+                      projectPageRef: projectPageRef,
+                    );
                   },
                 ),
               ),
@@ -47,8 +48,6 @@ class TaskList extends StatelessWidget {
   }
 }
 
-
-
 class _TasksTableHeaders extends StatelessWidget {
   const _TasksTableHeaders();
 
@@ -58,23 +57,26 @@ class _TasksTableHeaders extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
-      children: const [
+      children: [
         Expanded(
-            child: AutoSizeText(
-          'Nombre',
-          textAlign: TextAlign.start,
+            child: Container(
+          margin: const EdgeInsets.only(left:50),
+          child: const AutoSizeText(
+            'Nombre',
+            textAlign: TextAlign.start,
+          ),
         )),
-        Expanded(
+        const Expanded(
             child: AutoSizeText(
           'Categoría',
           textAlign: TextAlign.start,
         )),
-        Expanded(
+        const Expanded(
             child: AutoSizeText(
           'Usuario',
           textAlign: TextAlign.start,
         )),
-        Expanded(
+        const Expanded(
             child: AutoSizeText(
           'Fecha',
           textAlign: TextAlign.start,
@@ -83,5 +85,3 @@ class _TasksTableHeaders extends StatelessWidget {
     );
   }
 }
-
-

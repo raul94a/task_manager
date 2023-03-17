@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:task_manager/core/extensions/seconds_to_timer_extension.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/repositories/task_repository.dart';
@@ -11,15 +10,13 @@ import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
+import 'package:task_manager/provider/timer_stream.provider.dart';
 import 'package:task_manager/provider/update_task_time_provider.dart';
 
 class TaskTimer extends ConsumerStatefulWidget {
   const TaskTimer({
     super.key,
-  
   });
-
-
 
   @override
   ConsumerState<TaskTimer> createState() => _TaskTimerState();
@@ -31,7 +28,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
   bool isCurrentTaskRunning = false;
 
   late int secondsToStartStreaming;
-  final StreamController<int> controller = StreamController.broadcast();
+  late StreamController<int> controller;
   StreamSubscription<int>? subscription;
   changeStartStreamingStatus() {
     startStreaming.value = !startStreaming.value;
@@ -39,6 +36,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
 
   @override
   void initState() {
+    controller = ref.read(timerStreamProvider).controller;
     // if (!mTimerState.timerRunning) {
     //   mTimerState.task = task;
     // } else {
@@ -69,20 +67,18 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
     }
 
     final updatedTask = ref.read(updateTaskTimeState).task;
-    if(updatedTask != null && updatedTask.id == task.id){
+    if (updatedTask != null && updatedTask.id == task.id) {
       task = task.copyWith(timeInMillis: updatedTask.timeInMillis);
     }
     secondsToStartStreaming = task.seconds;
 
     final tasksProvider = ref.read(tasksProjectState);
-    final taskIndex =
-        tasksProvider.tasks.indexWhere((e) => e.id == task!.id);
+    final taskIndex = tasksProvider.tasks.indexWhere((e) => e.id == task!.id);
 
     print('Rebuildintg task timer');
 
     return Container(
-        decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: Colors.black))),
+        decoration: const BoxDecoration(),
         width: 400,
         height: 200,
         child: Column(
@@ -95,17 +91,14 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
               color: Colors.black,
               size: 90,
             ),
-            
-              if (!mTimerState.timerRunning) 
-                AutoSizeText(
-                  task == null
-                      ? "00:00:00"
-                      : task!.seconds.toTimer(),
-                  minFontSize: 21,
-                )else
-              
+            if (!mTimerState.timerRunning)
+              AutoSizeText(
+                task == null ? "00:00:00" : task!.seconds.toTimer(),
+                minFontSize: 21,
+              )
+            else
               StreamBuilder<int>(
-                  initialData: task!.seconds,
+                  initialData: task.seconds,
                   stream: controller.stream,
                   builder: (context, snapshot) {
                     // print(snapshot);
@@ -121,12 +114,11 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                         final updateTaskNotifier =
                             ref.read(updateTaskTimeState.notifier);
                         updateTaskNotifier.update((state) => state.copyWith(
-                            task: task!
-                                .copyWith(timeInMillis: data * 1000)));
+                            task: task!.copyWith(timeInMillis: data * 1000)));
 
                         print('Updating task: ${task!.name}');
                         if (data % 10 == 0) {
-                          TaskRepository().update(task!);
+                          TaskRepository().update(task);
                         }
                       });
                     }
@@ -135,8 +127,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                       data == null ? "00:00:00" : data.toTimer(),
                       minFontSize: 21,
                     );
-                  
-            }),
+                  }),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -164,13 +155,28 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                     return IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () async {
-                          await subscription?.cancel();
-                          subscription = null;
+                          subscription =
+                              ref.read(timerStreamProvider).subscription;
+                          //when the view is disposed
+                          //the subscription is null!
+                          //the way to stop the close is by closing the controller
+                          if (subscription == null) {
+                            controller.close();
+                          }
+
+                          ref.read(timerStreamProvider).subscription?.cancel();
+                          ref.read(timerStreamProvider).subscription = null;
+
                           final task = ref.read(updateTaskTimeState).task!;
-                          TasksProjectBloc(ref: ref).updateTask(task: task);
+                          try {
+                            TasksProjectBloc(ref: ref).updateTask(task: task);
+                          } catch (ex) {
+                            print(ex);
+                          }
                           TimerBloc(ref: ref).addSeconds(seconds: task.seconds);
                           TimerBloc(ref: ref).pauseRun();
                           TaskRepository().update(task);
+                          ref.read(timerState.notifier).state = TimerStateProvider(task: null,timerRunning: false);
                         },
                         icon: const Icon(
                           Icons.stop,
@@ -191,32 +197,36 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
     required TaskProjectStateProvider tasksProvider,
     required int taskIndex,
   }) {
-   
+    subscription = ref.read(timerStreamProvider).subscription;
+    print('TAG SUBSCRIPTION: ${subscription?.isPaused}');
+
     if (subscription != null && !subscription!.isPaused) {
+      print('On pause');
       subscription!.pause();
       timerBloc.pauseRun();
-  
 
       final task = ref.read(updateTaskTimeState).task!;
       TaskRepository().update(task);
     } else if (subscription != null && subscription!.isPaused) {
       subscription!.resume();
       timerBloc.startRun();
-    
+      print('On resume!');
     } else {
+      print('Start Timer');
       startTimer();
     }
   }
 
-  Stream<int> getStream({required int from}) => Stream.periodic(
-      const Duration(seconds: 1), (sec) => from + sec);
+  Stream<int> getStream({required int from}) =>
+      Stream.periodic(const Duration(seconds: 1), (sec) => from + sec);
 
   Stream<int> get stream => controller.stream;
 
   Sink<int> get sink => controller.sink;
 
   void startTimer() {
-    subscription = getStream(from: secondsToStartStreaming).listen(
+    final timerState = ref.read(timerStreamProvider);
+    timerState.subscription = getStream(from: secondsToStartStreaming).listen(
       (sec) {
         print('Seconds are: $sec');
         controller.sink.add(sec);
@@ -226,7 +236,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
         print('On done');
       },
     );
+    subscription = timerState.subscription;
     TimerBloc(ref: ref).startRun();
   }
-
 }

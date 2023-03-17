@@ -12,15 +12,14 @@ class TasksProjectBloc {
 
   void setProjectId(String projectId) {
     final notifier = ref.read(tasksProjectState);
-    notifier.projectId = projectId; 
+    notifier.projectId = projectId;
   }
+
   Future<void> loadTasks() async {
     final notifier = ref.read(tasksProjectState);
-   
 
     try {
-      final tasksDB =
-          await taskRepository.getAll(notifier.projectId ?? '');
+      final tasksDB = await taskRepository.getAll(notifier.projectId ?? '');
       notifier.tasks = [...tasksDB];
     } catch (ex) {
       rethrow;
@@ -31,12 +30,12 @@ class TasksProjectBloc {
 
   Future<void> getByProject(String projectId) async {
     final notifier = ref.read(tasksProjectState.notifier);
-    notifier.update((state) => state.copyWith(isError: false, isLoading: true,projectId: projectId));
+    notifier.update((state) =>
+        state.copyWith(isError: false, isLoading: true, projectId: projectId));
 
     try {
-      final tasksDB =
-          await taskRepository.getAll(projectId);
-          print(tasksDB);
+      final tasksDB = await taskRepository.getAll(projectId);
+      print(tasksDB);
       notifier.update((state) => state
           .copyWith(isError: false, isLoading: false, tasks: [...tasksDB]));
     } catch (ex) {
@@ -71,21 +70,24 @@ class TasksProjectBloc {
     }
   }
 
-  void updateTask({required Task task}){
+  void updateTask({required Task task}) {
     final state = ref.read(tasksProjectState);
     final tasks = state.tasks;
     final index = tasks.indexWhere((element) => element.id == task.id);
-    tasks[index] = task;
-    final notifier = ref.read(tasksProjectState.notifier);
-    notifier.update((state) => state.copyWith(tasks: [...tasks]));
+    try {
+      tasks[index] = task;
+      final notifier = ref.read(tasksProjectState.notifier);
+      notifier.update((state) => state.copyWith(tasks: [...tasks]));
+    } catch (ex) {
+      print(ex);
+    }
   }
 
-  void changeSelectedStatus({required TaskStatus status}){
+  void changeSelectedStatus({required TaskStatus status}) {
     final notifier = ref.read(tasksProjectState.notifier);
     print(status);
-    notifier.update((state) => state.copyWith(selectedStatus: status,isError: false));
+    notifier.update(
+        (state) => state.copyWith(selectedStatus: status, isError: false));
     print('State changed ${notifier.state}');
   }
-
- 
 }

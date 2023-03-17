@@ -1,7 +1,7 @@
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
@@ -11,8 +11,6 @@ import 'package:task_manager/views/features/project_page/task_status_selector/ta
 import 'package:task_manager/views/features/project_page/task_timer/task_timer.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_list.dart';
 import 'package:uuid/uuid.dart';
-
-
 
 class ProjectPage extends ConsumerWidget {
   const ProjectPage({super.key});
@@ -40,19 +38,41 @@ class ProjectPage extends ConsumerWidget {
           const SizedBox(
             height: 20,
           ),
-          Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AutoSizeText(project.name),
-             TaskTimer()
-                
-              
+              Consumer(builder: (context, ref, _) {
+                final task = ref.watch(timerState).task;
+                Project projectTask = project;
+                if (task != null) {
+                  projectTask = ref
+                      .read(projectsState)
+                      .getProjectById(projectId: task.projectId);
+                }
+                return SizedBox(
+                  height: 200,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        AutoSizeText('Proyecto ${projectTask.name}'),
+                        if(task != null)AutoSizeText('Cronometrando la tarea ${task.name}')
+                        
+                      ]),
+                );
+              }),
+              const TaskTimer()
             ],
           ),
           const SizedBox(
             height: 20,
           ),
           TasksStatusSelector(tasksBloc: tasksBloc),
-          TaskList(tasks: tasks,projectPageRef: ref,)
+          TaskList(
+            tasks: tasks,
+            projectPageRef: ref,
+          )
         ],
       ),
     );
@@ -90,4 +110,3 @@ class _NoTasksForProject extends ConsumerWidget {
     );
   }
 }
-

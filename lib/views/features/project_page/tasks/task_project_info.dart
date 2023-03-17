@@ -1,14 +1,11 @@
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/extensions/date_time_extensions.dart';
 import 'package:task_manager/core/extensions/seconds_to_timer_extension.dart';
 import 'package:task_manager/data/models/task_model.dart';
-import 'package:task_manager/data/repositories/task_repository.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
-import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/select_tasks_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 
 class ProjectTaskInfo extends ConsumerStatefulWidget {
@@ -40,75 +37,109 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
   Widget build(BuildContext context) {
     print('Building task info for ${widget.task.name}');
     void changeShowStatus() {
-      final timerProvider = ref.read(timerState);
-      final timerBloc = TimerBloc(ref: ref);
-
-      if (!timerProvider.timerRunning && !notifier.value) {
-        print('Changing task for timer');
-        timerBloc.prepareTimer(task: widget.task);
-      }else{
-        print('CANNOT CHANGE TASK');
-      }
       notifier.value = !notifier.value;
     }
 
+    final selectTaskStateProvider = ref.watch(selectTaskState);
     return GestureDetector(
       onTap: changeShowStatus,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.0),
-                color: Colors.white,
-              ),
-              child: Row(
-                key: widget.key,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(child: AutoSizeText(widget.task.name)),
-                  Expanded(
-                    flex: 1,
-                    child: Row(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 3.0),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  key: widget.key,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          constraints: const BoxConstraints(maxWidth: 150),
-                          decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.elliptical(100, 60)),
-                              color: Colors.pinkAccent),
-                          child: AutoSizeText(
-                            widget.task.category,
-                            textAlign: TextAlign.start,
-                          ),
+                        Radio(
+                            value: widget.task.id,
+                            groupValue: selectTaskStateProvider.taskId,
+                            onChanged: (taskId) {
+                              print(taskId);
+                              final timerProvider = ref.read(timerState);
+                              final timerBloc = TimerBloc(ref: ref);
+      
+                              if (!timerProvider.timerRunning &&
+                                  !notifier.value) {
+                                print('Changing task for timer');
+                                timerBloc.prepareTimer(task: widget.task);
+      
+                                ref.read(selectTaskState.notifier).update(
+                                    (state) =>
+                                        state = SelectTaskState(taskId: taskId));
+                              }
+                            }),
+                        const SizedBox(
+                          width: 10,
                         ),
+                        AutoSizeText(widget.task.name),
                       ],
+                    )),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            constraints: const BoxConstraints(maxWidth: 150),
+                            decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.elliptical(100, 60)),
+                                color: Colors.pinkAccent),
+                            child: AutoSizeText(
+                              widget.task.category,
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Expanded(
-                      child: AutoSizeText(
-                    'Raul',
-                    textAlign: TextAlign.start,
-                  )),
-                  Expanded(
-                      child:
-                          AutoSizeText(widget.task.createdAt.toSpanishDate()))
-                ],
-              ),
-            ),
-            ValueListenableBuilder(
-                valueListenable: notifier,
-                builder: (ctx, show, _) => TaskExtendedInfo(
-                      show: show,
-                      task: widget.task,
-                      projectPageRef: widget.projectPageRef,
+                    const Expanded(
+                        child: AutoSizeText(
+                      'Raul',
+                      textAlign: TextAlign.start,
+                    )),
+                    Expanded(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AutoSizeText(widget.task.createdAt.toSpanishDate()),
+                        // const SizedBox(),
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.more_horiz,
+                              size: 40,
+                            ))
+                      ],
                     ))
-          ],
+                  ],
+                ),
+              ),
+              ValueListenableBuilder(
+                  valueListenable: notifier,
+                  builder: (ctx, show, _) => TaskExtendedInfo(
+                        show: show,
+                        task: widget.task,
+                        projectPageRef: widget.projectPageRef,
+                      ))
+            ],
+          ),
         ),
       ),
     );
@@ -200,7 +231,6 @@ class TaskExtendedInfo extends ConsumerWidget {
                 ),
               ),
             ),
-           
           ],
         ),
       ),

@@ -15,7 +15,6 @@ class ProjectBloc {
     print('Triggering getProjects');
     //empezamos cambiando el state a loading... envuelvo al resto en un Future.delayed
     //para que se vea bien la actualización del estado
-   
 
     final notifier = ref.read(projectsState);
     try {
@@ -23,7 +22,6 @@ class ProjectBloc {
       notifier.projects = [...projects];
       return projects;
     } catch (ex) {
-      
       rethrow;
     }
   }
@@ -48,5 +46,34 @@ class ProjectBloc {
     }
   }
 
-  
+  Future<void> deleteProject(Project project) async {
+    final notifier = ref.read(projectsState.notifier);
+    try {
+      final id = project.id;
+      print('Borrando proyecto $id');
+      final projects = notifier.state.projects;
+      projects.removeWhere((element) => element.id == id);
+      await repository.delete(id);
+      notifier.update((state) => state.copyWith(projects: [...projects]));
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> updateProject({required Project project}) async {
+     final notifier = ref.read(projectsState.notifier);
+    try {
+      final id = project.id;
+      print('Update proyecto $id');
+      final projects = notifier.state.projects;
+      final index  = projects.indexWhere((element) => element.id == project.id);
+      projects[index] = project;
+      await repository.update( project);
+      notifier.update((state) => state.copyWith(projects: [...projects]));
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
 }

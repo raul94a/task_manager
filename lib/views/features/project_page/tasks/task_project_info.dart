@@ -7,6 +7,8 @@ import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
 import 'package:task_manager/provider/select_tasks_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
+import 'package:task_manager/provider/timer_stream.provider.dart';
+import 'package:task_manager/views/shared/app_snackbar.dart';
 
 class ProjectTaskInfo extends ConsumerStatefulWidget {
   const ProjectTaskInfo(
@@ -31,6 +33,33 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
   void dispose() {
     notifier.dispose();
     super.dispose();
+  }
+
+  void onSelectTask(String? taskId) {
+    final timerStreamState = ref.read(timerStreamProvider);
+    final timerProvider = ref.watch(timerState);
+    final timerBloc = TimerBloc(ref: ref);
+    if (timerStreamState.subscription != null &&
+        timerStreamState.subscription!.isPaused) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Hay una tarea pausada. Debes detenerla antes de cambiar de tarea')));
+
+      return;
+    }
+    if (!timerProvider.timerRunning && !notifier.value) {
+      print('Changing task for timer');
+      timerBloc.prepareTimer(task: widget.task);
+
+      ref
+          .read(selectTaskState.notifier)
+          .update((state) => state = SelectTaskState(taskId: taskId));
+      return;
+    }
+    AppSnackbar.createSnackbar(
+        context: context,
+        message:
+            'Imposible seleccionar tarea. Ya hay una tarea siendo cronometrada.');
   }
 
   @override
@@ -68,21 +97,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                         Radio(
                             value: widget.task.id,
                             groupValue: selectTaskStateProvider.taskId,
-                            onChanged: (taskId) {
-                              print(taskId);
-                              final timerProvider = ref.read(timerState);
-                              final timerBloc = TimerBloc(ref: ref);
-      
-                              if (!timerProvider.timerRunning &&
-                                  !notifier.value) {
-                                print('Changing task for timer');
-                                timerBloc.prepareTimer(task: widget.task);
-      
-                                ref.read(selectTaskState.notifier).update(
-                                    (state) =>
-                                        state = SelectTaskState(taskId: taskId));
-                              }
-                            }),
+                            onChanged: onSelectTask),
                         const SizedBox(
                           width: 10,
                         ),
@@ -97,8 +112,8 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                             padding: const EdgeInsets.all(8.0),
                             constraints: const BoxConstraints(maxWidth: 150),
                             decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.elliptical(100, 60)),
+                                borderRadius: BorderRadius.all(
+                                    Radius.elliptical(100, 60)),
                                 color: Colors.pinkAccent),
                             child: AutoSizeText(
                               widget.task.category,

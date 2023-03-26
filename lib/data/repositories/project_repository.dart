@@ -21,13 +21,41 @@ class ProjectRepository {
   Future<List<Project>> getAll() async {
     try {
       final connection = MySQLManager.instance.conn!;
-      final rows =
-          (await connection.execute('SELECT * FROM projects')).rows.toList();
+      final rows = (await connection
+              .execute('SELECT * FROM projects where active is TRUE'))
+          .rows
+          .toList();
       return rows.map((e) => Project.fromMap(e.typedAssoc())).toList();
     } catch (ex) {
       rethrow;
     }
   }
 
-  Future<void> update(Project project) async {}
+  Future<void> update(Project project) async {
+    print('On update project...');
+    final connection = MySQLManager.instance.conn!;
+    try {
+      final preparedStatement = (await connection
+          .prepare('update projects set name = ? where id = ?'));
+      await preparedStatement.execute([project.name, project.id]);
+      await preparedStatement.deallocate();
+    } catch (ex) {
+      print(ex);
+      rethrow;
+    }
+  }
+
+  Future<void> delete(String id) async {
+    print('On delete project...');
+    final connection = MySQLManager.instance.conn!;
+    try {
+      final preparedStatement = (await connection
+          .prepare('update projects set active = FALSE where id = ?'));
+      await preparedStatement.execute([id]);
+      await preparedStatement.deallocate();
+    } catch (ex) {
+      print(ex);
+      rethrow;
+    }
+  }
 }

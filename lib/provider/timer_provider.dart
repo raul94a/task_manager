@@ -49,6 +49,10 @@ class TimerStateProvider {
     return TimerStateProvider(task: task);
   }
 
+  TimerStateProvider clearTask(){
+    return TimerStateProvider(task: null, timerRunning: timerRunning, subscription: subscription);
+  }
+
   // void startTimer() {
   //   // subscription?.cancel();
     

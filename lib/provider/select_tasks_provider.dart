@@ -22,4 +22,12 @@ class SelectTaskState {
 
   @override
   String toString() => 'SelectTaskState(taskId: $taskId)';
+
+  SelectTaskState copyWith({
+    String? taskId,
+  }) {
+    return SelectTaskState(
+      taskId: taskId
+    );
+  }
 }

@@ -59,6 +59,7 @@ class TasksProjectBloc {
       await taskRepository.create(task);
       final isSelectedProject = notifier.state.projectId == task.projectId;
       if (isSelectedProject) {
+        print('Add task to current list!');
         final tasks = notifier.state.tasks;
         tasks.add(task);
         notifier.update((state) => state

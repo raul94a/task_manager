@@ -8,6 +8,7 @@ import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/repositories/task_repository.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
+import 'package:task_manager/provider/select_tasks_provider.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 import 'package:task_manager/provider/timer_stream.provider.dart';
@@ -93,7 +94,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
             ),
             if (!mTimerState.timerRunning)
               AutoSizeText(
-                task == null ? "00:00:00" : task!.seconds.toTimer(),
+                task.seconds.toTimer(),
                 minFontSize: 21,
               )
             else
@@ -177,6 +178,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                           TimerBloc(ref: ref).pauseRun();
                           TaskRepository().update(task);
                           ref.read(timerState.notifier).state = TimerStateProvider(task: null,timerRunning: false);
+                          ref.read(selectTaskState.notifier).update((state) => state.copyWith(taskId: null));
                         },
                         icon: const Icon(
                           Icons.stop,

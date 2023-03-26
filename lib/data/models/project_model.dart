@@ -4,18 +4,20 @@ class Project {
   final String name;
   final DateTime createdAt;
   final DateTime updatedAt;
-
+  final bool active;
   Project({
     required this.id,
     required this.name,
     required this.createdAt,
     required this.updatedAt,
+    this.active = true,
   });
   
   Project copyWith({
     String? id,
     String? name,
     DateTime? createdAt,
+    bool? active,
     DateTime? updatedAt,
   }) {
     return Project(
@@ -23,6 +25,7 @@ class Project {
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      active: active ?? this.active,
     );
   }
 

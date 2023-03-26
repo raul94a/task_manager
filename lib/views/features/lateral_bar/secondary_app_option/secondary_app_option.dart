@@ -22,6 +22,8 @@ class SecondaryAppOption extends ConsumerWidget {
 
     if (option == MainOption.projects) {
       final projects = ref.watch(projectsState).projects;
+      print('Building projects option');
+      print(projects);
       return ProjectsOption(
           secondaryContainerWidth: secondaryContainerWidth, projects: projects);
     } else if (option == MainOption.stats) {

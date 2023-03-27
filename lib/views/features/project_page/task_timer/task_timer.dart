@@ -89,7 +89,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
             ),
             const Icon(
               Icons.timer,
-              color: Colors.black,
+             color: Colors.white,
               size: 90,
             ),
             if (!mTimerState.timerRunning)

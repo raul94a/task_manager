@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/enums/main_option_enum.dart';
 import 'package:task_manager/logic/main_option_bloc.dart';
+import 'package:task_manager/provider/main_option_provider.dart';
 
 class MainAppOption extends StatelessWidget {
   const MainAppOption({super.key});
@@ -21,6 +22,22 @@ class MainOptionItem extends ConsumerWidget {
   final int index;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedMainOption = ref.watch(mainOptionState);
+    bool isSelected = false;
+    switch (selectedMainOption.selectedOptionFromMainMenu) {
+      case MainOption.projects:
+        isSelected = index == 0;
+        break;
+      case MainOption.stats:
+        isSelected = index == 1;
+
+        break;
+      case MainOption.settings:
+        isSelected = index == 2;
+
+        break;
+    }
+    const selecdtedColor = Color.fromARGB(255, 230, 168, 192);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -32,11 +49,19 @@ class MainOptionItem extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(vertical: 15),
           child: Column(
             children: [
-              Icon(iconDataByIndex[index], size:  60,),
+              Icon(
+                iconDataByIndex[index],
+                size: 60,
+                color: isSelected ? selecdtedColor : Colors.white,
+              ),
               const SizedBox(
                 height: 5,
               ),
-              Text(optionsByIndex[index]!)
+              Text(
+                optionsByIndex[index]!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isSelected ? selecdtedColor : Colors.white),
+              )
             ],
           ),
         ),

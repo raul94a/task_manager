@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
+import 'package:task_manager/views/styles/form_decoration.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTaskDialog extends ConsumerStatefulWidget {
@@ -33,28 +34,13 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
     super.dispose();
   }
 
-  InputDecoration getDecoration() {
-    return const InputDecoration(
-      border: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 0.75),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.red, width: 0.75),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 0.75),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black, width: 0.75),
-      ),
-    );
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Dialog(
-      insetPadding: EdgeInsets.zero,
+      
+      insetPadding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 14),
       child: SizedBox(
         width: size.width * 0.6,
         child: Form(
@@ -154,6 +140,10 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
                         child: const Text('Cancelar',style: TextStyle(color: Colors.red),)),
                     const SizedBox(width: 20,),
                     ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStateProperty.resolveWith((states) => Size(115, 35)),
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Color.fromARGB(255, 63, 63, 63))
+                      ),
                         onPressed: () {
                           if (!formKey.currentState!.validate()) {
                             return;

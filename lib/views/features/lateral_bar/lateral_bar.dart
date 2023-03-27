@@ -15,8 +15,12 @@ class LateralBar extends StatelessWidget {
       height: height,
       width: mainContainerWidth,
       constraints: const BoxConstraints(minWidth: 250, maxWidth: 450),
-      decoration:
-          BoxDecoration(border: Border(right: BorderSide(color: Colors.black,width: 5.5))),
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(color: Colors.black, width: 5.5),
+        ),
+        color: Color.fromARGB(246, 56, 56, 56),
+      ),
       child: Row(
         children: [
           SizedBox(
@@ -26,7 +30,7 @@ class LateralBar extends StatelessWidget {
           Expanded(
             child: Container(
               height: height,
-              color: Colors.white,
+             
               child: SecondaryAppOption(
                   secondaryContainerWidth: mainContainerWidth * 0.6),
             ),

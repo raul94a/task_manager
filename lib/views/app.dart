@@ -12,32 +12,46 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ContextMenuOverlay(
-      child: Scaffold(
-        body: Column(
-          children: [
-            Row(
-              children: [
-                const LateralBar(),
-                Expanded(child: Consumer(builder: (ctx, ref, _) {
-                  final mainOption = ref.watch(mainOptionState);
+      child: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                tileMode: TileMode.decal,
+                colors: [
+                  Color.fromARGB(255, 15, 15, 15),
+                  Color.fromARGB(245, 0, 0, 0),
+                  Color.fromARGB(255, 22, 21, 21),
+                  Color.fromARGB(255, 63, 62, 62)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight)),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: [
+              Row(
+                children: [
+                  const LateralBar(),
+                  Expanded(child: Consumer(builder: (ctx, ref, _) {
+                    final mainOption = ref.watch(mainOptionState);
 
-                  if (mainOption.selectedOptionFromMainMenu ==
-                      MainOption.stats) {
-                    return const Center(
-                      child: Text('COnstrucction'),
-                    );
-                  } else if (mainOption.selectedOptionFromMainMenu ==
-                      MainOption.settings) {
-                    return const Center(
-                      child: Text('COnstrucction'),
-                    );
-                  }
+                    if (mainOption.selectedOptionFromMainMenu ==
+                        MainOption.stats) {
+                      return const Center(
+                        child: Text('COnstrucction'),
+                      );
+                    } else if (mainOption.selectedOptionFromMainMenu ==
+                        MainOption.settings) {
+                      return const Center(
+                        child: Text('COnstrucction'),
+                      );
+                    }
 
-                  return const ProjectPage();
-                }))
-              ],
-            )
-          ],
+                    return const ProjectPage();
+                  }))
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

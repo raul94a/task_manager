@@ -6,10 +6,10 @@ class TaskRepository {
     final connection = MySQLManager.instance.conn!;
     try {
       final prepareStatement = (await connection.prepare(
-        'INSERT INTO tasks(id, name,category,project_id) VALUES(?,?,?,?)',
+        'INSERT INTO tasks(id, name,category, description, project_id) VALUES(?,?,?,?,?)',
       ));
       final result = await prepareStatement
-          .execute([task.id, task.name, task.category, task.projectId]);
+          .execute([task.id, task.name, task.category, task.description, task.projectId]);
       await prepareStatement.deallocate();
 
       print(result.rows.toList());

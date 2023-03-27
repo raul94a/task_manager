@@ -71,11 +71,29 @@ class TasksProjectBloc {
     }
   }
 
+  Future<void> updateTaskDB({required Task task}) async {
+    final notifier = ref.read(tasksProjectState.notifier);
+    notifier.update((state) => state.copyWith(isError: false, isLoading: true));
+
+    try {
+      await taskRepository.update(task);
+      final index = notifier.state.tasks.indexWhere((element) => element.id == task.id);
+      final tasks = notifier.state.tasks;
+      tasks[index] = task;
+      notifier.update((state) => state.copyWith(tasks: [...tasks]));
+    } catch (ex) {
+      notifier.update((state) =>
+          state.copyWith(isError: true, isLoading: false, tasks: []));
+    }
+  }
+
   void updateTask({required Task task}) {
     final state = ref.read(tasksProjectState);
     final tasks = state.tasks;
     final index = tasks.indexWhere((element) => element.id == task.id);
     try {
+         
+
       tasks[index] = task;
       final notifier = ref.read(tasksProjectState.notifier);
       notifier.update((state) => state.copyWith(tasks: [...tasks]));

@@ -120,12 +120,13 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
             .update((state) => state.copyWith(taskId: null));
         ref.read(timerState.notifier).update((state) => state.clearTask());
       },
+      
       child: AnimatedBuilder(
         animation: controller,
         builder: (ctx, _) => Container(
           color: isTextHovered
-              ? Color.fromARGB(opacityAnimation.value.toInt(), 207, 207, 207)
-              : Colors.white,
+              ? Color.fromARGB(opacityAnimation.value.toInt(), 1, 1,1)
+              : Colors.transparent,
           key: widget.key,
           padding: const EdgeInsets.all(8.0),
           child: MouseRegion(

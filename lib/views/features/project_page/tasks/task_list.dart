@@ -5,7 +5,7 @@ import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_project_info.dart';
 
 class TaskList extends StatelessWidget {
-  const TaskList({required this.tasks, required this.projectPageRef});
+  const TaskList({super.key, required this.tasks, required this.projectPageRef});
   final WidgetRef projectPageRef;
   final List<Task> tasks;
 
@@ -14,21 +14,25 @@ class TaskList extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(6.0),
-        color: Colors.lightBlue,
+        decoration: const BoxDecoration(
+       
+        ),
         child: Visibility(
           replacement: const Center(child: Text('No hay tareas que mostrar')),
           visible: tasks.isNotEmpty,
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 10,
-              ),
-              const _TasksTableHeaders(),
-              const SizedBox(
-                height: 5,
-              ),
-              Expanded(
-                child: ListView.builder(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                const _TasksTableHeaders(),
+                const SizedBox(
+                  height: 5,
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     final task = tasks[index];
@@ -39,8 +43,8 @@ class TaskList extends StatelessWidget {
                     );
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_manager/core/enums/main_option_enum.dart';
 import 'package:task_manager/logic/main_option_bloc.dart';
 import 'package:task_manager/provider/main_option_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 
 class MainAppOption extends StatelessWidget {
   const MainAppOption({super.key});
@@ -38,13 +39,18 @@ class MainOptionItem extends ConsumerWidget {
 
         break;
     }
-    const selecdtedColor = Color.fromARGB(255, 230, 168, 192);
+    final darkMode = ref.read(themeState).darkMode;
+    final selecdtedColor =  darkMode ? Color.fromARGB(255, 230, 168, 192) : Color.fromARGB(255, 240, 228, 123);
+    const unselectedColor = Colors.white;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
           final mainOptBloc = MainOptionBloc(ref: ref);
           mainOptBloc.changeOption(option: mainOptionsByIndex[index]!);
+          if(index == 2){
+            ref.read(themeState.notifier).update((state) => ThemeState(darkMode: !state.darkMode));
+          }
         },
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 15),
@@ -55,7 +61,7 @@ class MainOptionItem extends ConsumerWidget {
                 iconDataByIndex[index]!,
                 width: 50,
                 height: 50,
-                color: isSelected ? selecdtedColor : Colors.white,
+                color: isSelected ? selecdtedColor : unselectedColor,
               ),
               const SizedBox(
                 height: 5,

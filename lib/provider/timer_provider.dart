@@ -17,40 +17,32 @@ final timerState = StateProvider((ref) {
 });
 
 class TimerStateProvider {
-  StreamController<int> controller = StreamController<int>.broadcast();
   Task? task;
 
   bool timerRunning;
-  StreamSubscription<int>? subscription;
 
-  TimerStateProvider({this.task,  this.timerRunning = false, this.subscription});
 
-  TimerStateProvider.withController({this.task, this.timerRunning  = false, this.subscription, required this.controller});
+  TimerStateProvider({this.task,  this.timerRunning = false});
+
+  TimerStateProvider.withController({this.task, this.timerRunning  = false, });
 
   TimerStateProvider copyWith(
-      {Task? task, StreamController<int>? controller, bool? timerRunning, StreamSubscription<int>? subscription}) {
+      {Task? task, bool? timerRunning,}) {
     return TimerStateProvider(
       task: task ?? this.task,
      
-      subscription: subscription ?? this.subscription,
+    
       timerRunning: timerRunning ?? this.timerRunning,
     );
   }
-  TimerStateProvider copyWithController({Task? task, StreamController<int>? controller, bool? timerRunning, StreamSubscription<int>? subscription}){
-    return TimerStateProvider.withController(
-      task: task ?? this.task,
-      controller: controller ?? this.controller,
-      subscription: subscription ?? this.subscription,
-      timerRunning: timerRunning ?? this.timerRunning,
-    );
-  }
+ 
 
   TimerStateProvider withTask(Task? task) {
     return TimerStateProvider(task: task);
   }
 
   TimerStateProvider clearTask(){
-    return TimerStateProvider(task: null, timerRunning: timerRunning, subscription: subscription);
+    return TimerStateProvider(task: null, timerRunning: timerRunning, );
   }
 
   // void startTimer() {
@@ -67,18 +59,6 @@ class TimerStateProvider {
         const Duration(seconds: 1), (second) => fromSeconds + second);
   }
 
-  resume() {
-    subscription?.resume();
-  }
-
-  pause() {
-    subscription?.pause();
-  }
-
-  disposeSubscription() {
-    subscription?.cancel();
-    subscription = null;
-  }
 
   @override
   String toString() => 'TimerStateProvider(task: $task})';

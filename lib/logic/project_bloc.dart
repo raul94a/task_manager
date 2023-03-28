@@ -19,6 +19,7 @@ class ProjectBloc {
     final notifier = ref.read(projectsState);
     try {
       final projects = await repository.getAll();
+      print('Repository projects: $projects');
       notifier.projects = [...projects];
       return projects;
     } catch (ex) {
@@ -26,7 +27,7 @@ class ProjectBloc {
     }
   }
 
-  Future<void> createProject(String name) async {
+  Future<Project?> createProject(String name) async {
     final notifier = ref.read(projectsState.notifier);
 
     notifier.update((state) => state.copyWith(isError: false, isLoading: true));
@@ -41,6 +42,7 @@ class ProjectBloc {
       projects.add(project);
       notifier.update((state) => state
           .copyWith(projects: [...projects], isError: false, isLoading: false));
+      return project;
     } catch (ex) {
       notifier.update((state) => state.copyWith(isError: true));
     }
@@ -62,14 +64,14 @@ class ProjectBloc {
   }
 
   Future<void> updateProject({required Project project}) async {
-     final notifier = ref.read(projectsState.notifier);
+    final notifier = ref.read(projectsState.notifier);
     try {
       final id = project.id;
       print('Update proyecto $id');
       final projects = notifier.state.projects;
-      final index  = projects.indexWhere((element) => element.id == project.id);
+      final index = projects.indexWhere((element) => element.id == project.id);
       projects[index] = project;
-      await repository.update( project);
+      await repository.update(project);
       notifier.update((state) => state.copyWith(projects: [...projects]));
     } catch (e) {
       print(e);

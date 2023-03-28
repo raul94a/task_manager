@@ -1,17 +1,20 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/enums/task_status_enum.dart';
+import 'package:task_manager/core/extensions/context_extension.dart';
 import 'package:task_manager/core/extensions/date_time_extensions.dart';
 import 'package:task_manager/core/extensions/seconds_to_timer_extension.dart';
 import 'package:task_manager/data/models/task_model.dart';
+import 'package:task_manager/logic/select_task_bloc.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
 import 'package:task_manager/provider/select_tasks_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 import 'package:task_manager/provider/timer_stream.provider.dart';
-import 'package:task_manager/views/shared/app_snackbar.dart';
+import 'package:task_manager/provider/update_task_time_provider.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 import 'package:task_manager/views/styles/form_decoration.dart';
 
 class ProjectTaskInfo extends ConsumerStatefulWidget {
@@ -74,27 +77,30 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
     final timerStreamState = ref.read(timerStreamProvider);
     final timerProvider = ref.watch(timerState);
     final timerBloc = TimerBloc(ref: ref);
+    final selectTaskBloc = SelectTaskBloc(ref: ref);
+
     if (timerStreamState.subscription != null &&
         timerStreamState.subscription!.isPaused) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Hay una tarea pausada. Debes detenerla antes de cambiar de tarea')));
+      context.showSnackBar(
+          'Hay una tarea pausada. Debes detenerla antes de cambiar de tarea');
 
       return;
     }
-    if (!timerProvider.timerRunning && !notifier.value) {
+    if (!timerProvider.timerRunning) {
       print('Changing task for timer');
-      timerBloc.prepareTimer(task: widget.task);
+      final selectedTaskId = ref.read(selectTaskState).taskId;
 
-      ref
-          .read(selectTaskState.notifier)
-          .update((state) => state = SelectTaskState(taskId: taskId));
+      if (selectedTaskId != null && selectedTaskId == widget.task.id) {
+        selectTaskBloc.clearSelectedTask();
+        timerBloc.clearTimer();
+        return;
+      }
+      timerBloc.prepareTimer(task: widget.task);
+      selectTaskBloc.setTask(widget.task);
       return;
     }
-    AppSnackbar.createSnackbar(
-        context: context,
-        message:
-            'Imposible seleccionar tarea. Ya hay una tarea siendo cronometrada.');
+    context.showSnackBar(
+        'Imposible seleccionar tarea. Ya hay una tarea siendo cronometrada.');
   }
 
   void changeShowStatus() {
@@ -126,11 +132,17 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
     print('Building task info for ${widget.task.name}');
 
     final selectTaskStateProvider = ref.watch(selectTaskState);
+    final darkMode = ref.read(themeState).darkMode;
     return GestureDetector(
       onTap: changeShowStatus,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
-        color: const Color.fromARGB(246, 44, 44, 44),
+        decoration: BoxDecoration(
+          border: darkMode ? null : Border.all(color: lateralBarBg),
+          borderRadius: BorderRadius.circular(5.0),
+        color:
+            !darkMode ? Colors.white10 : const Color.fromARGB(246, 44, 44, 44),
+        ),
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: Column(
@@ -155,6 +167,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                                   TaskStatus.Pending.status &&
                               !editMode),
                           child: Radio(
+                              toggleable: true,
                               fillColor: MaterialStateProperty.resolveWith(
                                   (states) => Colors.white),
                               value: widget.task.id,
@@ -275,6 +288,7 @@ class TaskExtendedInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isTaskStarted = task.timeInMillis != null;
+    final lightMode = !ref.read(themeState).darkMode;
     return Visibility(
       maintainState: false,
       visible: show,
@@ -283,7 +297,7 @@ class TaskExtendedInfo extends ConsumerWidget {
         margin: const EdgeInsets.only(top: 3),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
-          color: const Color.fromARGB(246, 44, 44, 44),
+          color: lightMode ? Colors.white :const Color.fromARGB(246, 44, 44, 44),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -324,24 +338,15 @@ class TaskExtendedInfo extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Consumer(builder: (context, ref, _) {
-                          final task = ref
-                              .watch(timerState.select((value) => value.task));
-
                           int dedicatedTime = 0;
-                          if (task != null &&
-                              this.task.id == task.id &&
-                              ref.read(timerState).timerRunning) {
-                            print(
-                                'The task is the same as selected: ${this.task.id}/${task.id}');
-                            dedicatedTime = task.seconds;
-                          } else {
-                            print('The task is not the same as selected one');
-                            print('${this.task.name}/${task?.name}');
-                            dedicatedTime = this.task.seconds;
+
+                          dedicatedTime = task.seconds;
+
+                          final updateTask =
+                              ref.watch(updateTaskTimeState).task;
+                          if (updateTask != null && updateTask.id == task.id) {
+                            dedicatedTime = updateTask.seconds;
                           }
-
-                          //print('rebuilding tiempo dedicado with task $task');
-
                           return Text(
                               'Tiempo dedicado: ${isTaskStarted ? dedicatedTime.toTime() : '-'}');
                         }),
@@ -365,6 +370,7 @@ class TaskExtendedInfo extends ConsumerWidget {
                                 width: 10,
                               ),
                               _FinishButton(
+                                lightMode: lightMode,
                                   task: task,
                                   onPressed: () {
                                     final newStatus = task.status ==
@@ -449,9 +455,10 @@ class _AbandonButton extends StatelessWidget {
 }
 
 class _FinishButton extends StatelessWidget {
-  const _FinishButton({super.key, required this.task, required this.onPressed});
+  const _FinishButton({super.key, required this.task, required this.onPressed,required this.lightMode});
   final VoidCallback onPressed;
   final Task task;
+  final bool lightMode;
   @override
   Widget build(BuildContext context) {
     return Visibility(
@@ -459,7 +466,7 @@ class _FinishButton extends StatelessWidget {
       child: ElevatedButton(
           style: ButtonStyle(
               fixedSize: getProperty(Size(115, 35)),
-              backgroundColor: getProperty(Color.fromARGB(255, 83, 83, 83))),
+              backgroundColor: getProperty(lightMode ? lateralBarBg : const Color.fromARGB(255, 83, 83, 83))),
           onPressed: onPressed,
           child: Text(task.status == TaskStatus.Completed.status
               ? 'Reactivar'

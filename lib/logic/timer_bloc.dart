@@ -52,25 +52,11 @@ class TimerBloc {
 
   void resumeRun() {
     ref.read(timerState.notifier).update((state) => state.copyWith(
-        timerRunning: true, subscription: state.subscription?..resume()));
+        timerRunning: true, ));
   }
 
-  void addSeconds({required int seconds}) {
-    ref.read(timerState.notifier).update((state) => state.copyWith(
-        task: state.task?.copyWith(timeInMillis: seconds * 1000)));
-  }
 
-  void cancelSubscription() {
-    final state = ref.read(timerState);
-    state.disposeSubscription();
-    state.controller.close();
-  }
-
-  void destroyTimer() {
-    cancelSubscription();
-    ref.read(timerState.notifier).update((state) => state.copyWithController(
-        timerRunning: false,
-        controller: StreamController<int>.broadcast(),
-        subscription: null));
+  void clearTimer(){
+    ref.read(timerState.notifier).update((state) => TimerStateProvider(task: null));
   }
 }

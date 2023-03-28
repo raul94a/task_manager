@@ -164,8 +164,8 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
                             createdAt: now,
                             updatedAt: now,
                           );
-                          TasksProjectBloc(ref: ref).createTask(task: task);
                           Navigator.of(context).pop();
+                          TasksProjectBloc(ref: ref).createTask(task: task);
                         },
                         child: const Text('Añadir tarea')),
                   ],

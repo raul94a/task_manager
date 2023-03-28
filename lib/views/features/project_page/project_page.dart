@@ -7,18 +7,20 @@ import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 import 'package:task_manager/views/features/lateral_bar/secondary_app_option/dialogs/add_task_dialog.dart';
 import 'package:task_manager/views/features/project_page/task_status_selector/task_status_selector.dart';
 import 'package:task_manager/views/features/project_page/task_timer/task_timer.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_list.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 class ProjectPage extends ConsumerWidget {
   const ProjectPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final projects = ref.read(projectsState).projects;
+    final projects = ref.watch(projectsState.select((value) => value.projects));
     if(projects.isEmpty){
       return const Center(child: Text('No hay proyectos'),);
     }
@@ -36,8 +38,9 @@ class ProjectPage extends ConsumerWidget {
 
     final tasks = taskProjectState.getTasksBySelectedStatus();
     final tasksBloc = TasksProjectBloc(ref: ref);
-
-    return SizedBox(
+    final lightMode = !ref.read(themeState).darkMode;
+    return Container(
+      color: lightMode ? lateralBarBg : null,
       height: height,
       child: Column(
         children: [
@@ -73,6 +76,7 @@ class ProjectPage extends ConsumerWidget {
           ),
           TasksStatusSelector(tasksBloc: tasksBloc),
           TaskList(
+            lightMode: lightMode,
             tasks: tasks,
             projectPageRef: ref,
           )

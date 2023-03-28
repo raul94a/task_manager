@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/views/features/lateral_bar/secondary_app_option/secondary_app_option.dart';
 import 'package:task_manager/views/features/lateral_bar/main_app_option/main_app_option.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 class LateralBar extends StatelessWidget {
-  const LateralBar({super.key});
+  const LateralBar({super.key, required this.darkMode});
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +17,11 @@ class LateralBar extends StatelessWidget {
       height: height,
       width: mainContainerWidth,
       constraints: const BoxConstraints(minWidth: 250, maxWidth: 450),
-      decoration: const BoxDecoration(
-        border: Border(
+      decoration: BoxDecoration(
+        border: const Border(
           right: BorderSide(color: Colors.black, width: 5.5),
         ),
-        color: Color.fromARGB(246, 56, 56, 56),
+        color: !darkMode ? lateralBarBg : Color.fromARGB(246, 56, 56, 56),
       ),
       child: Row(
         children: [

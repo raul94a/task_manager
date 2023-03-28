@@ -5,7 +5,8 @@ import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_project_info.dart';
 
 class TaskList extends StatelessWidget {
-  const TaskList({super.key, required this.tasks, required this.projectPageRef});
+  const TaskList({super.key, required this.tasks, required this.projectPageRef,required this.lightMode});
+  final bool lightMode;
   final WidgetRef projectPageRef;
   final List<Task> tasks;
 
@@ -14,8 +15,8 @@ class TaskList extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(6.0),
-        decoration: const BoxDecoration(
-       
+        decoration: BoxDecoration(
+          color: lightMode ? Colors.white : null
         ),
         child: Visibility(
           replacement: const Center(child: Text('No hay tareas que mostrar')),

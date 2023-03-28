@@ -113,14 +113,16 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                     }
                     if (data != null) {
                       Future.microtask(() {
+                        final timeInMillis = data * 1000;
+                        final newTask = task!.copyWith(timeInMillis: timeInMillis);
                         final updateTaskNotifier =
                             ref.read(updateTaskTimeState.notifier);
                         updateTaskNotifier.update((state) => state.copyWith(
-                            task: task!.copyWith(timeInMillis: data * 1000)));
+                            task: newTask));
 
-                        print('Updating task: ${task!.name}');
                         if (data % 10 == 0) {
-                          TaskRepository().update(task);
+                        print('Updating task: $newTask');
+                          TaskRepository().update(newTask);
                         }
                       });
                     }
@@ -175,7 +177,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                           } catch (ex) {
                             print(ex);
                           }
-                          TimerBloc(ref: ref).addSeconds(seconds: task.seconds);
+                         
                           TimerBloc(ref: ref).pauseRun();
                           TaskRepository().update(task);
                           ref.read(timerState.notifier).state =
@@ -235,7 +237,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
     final timerState = ref.read(timerStreamProvider);
     timerState.subscription = getStream(from: secondsToStartStreaming).listen(
       (sec) {
-        print('Seconds are: $sec');
+        
         controller.sink.add(sec);
       },
       onDone: () {

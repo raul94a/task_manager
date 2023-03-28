@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/mixins/material_state_property_mixin.dart';
 import 'package:task_manager/logic/project_bloc.dart';
+import 'package:task_manager/logic/tasks_project_bloc.dart';
+import 'package:task_manager/provider/project_provider.dart';
+import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 
 class CreateNewProject extends StatefulWidget {
   const CreateNewProject({super.key, required this.secondaryContainerWidth});
@@ -29,25 +33,32 @@ class _CreateNewProjectState extends State<CreateNewProject> {
           bottom: BorderSide(color: Colors.black, width: 1.0),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: widget.secondaryContainerWidth * 0.6,
-            child: AutoSizeText(
-              'Añadir nuevo proyecto',
-              minFontSize: 8,
-              maxLines: 4,
-              group: AutoSizeGroup(),
-              overflow: TextOverflow.fade,
+      child: Consumer(
+        builder: (ctx, ref, _) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              width: widget.secondaryContainerWidth * 0.6,
+              child: AutoSizeText(
+                'Añadir nuevo proyecto',
+                minFontSize: 8,
+                maxLines: 4,
+                group: AutoSizeGroup(),
+                overflow: TextOverflow.fade,
+                style: !ref.read(themeState).darkMode
+                    ? Theme.of(context).textTheme.labelMedium
+                    : null,
+              ),
             ),
-          ),
-          Expanded(
-            child: IconButton(
-                onPressed: () => _createProjectDialog(context),
-                icon: const Icon(Icons.add)),
-          )
-        ],
+            Expanded(
+              child: IconButton(
+                  onPressed: () => _createProjectDialog(context),
+                  icon: const Icon(Icons.add),color: !ref.read(themeState).darkMode
+                    ? Colors.white
+                    : null,),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -123,7 +134,15 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
     if (!formKey.currentState!.validate()) {
       return;
     }
-    ProjectBloc(context: context, ref: ref).createProject(text);
+
+    ProjectBloc(context: context, ref: ref).createProject(text).then((project) {
+      final projects = ref.read(projectsState).projects;
+      if (projects.length == 1) {
+        TasksProjectBloc(ref: ref).setProjectId(project!.id);
+      }
+    }).catchError((err, stack) {
+      return null;
+    });
     Navigator.of(context).pop();
   }
 

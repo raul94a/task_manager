@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/enums/task_status_enum.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
+import 'package:task_manager/provider/select_tasks_provider.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 class TasksStatusSelector extends StatelessWidget {
   const TasksStatusSelector({
@@ -65,8 +68,14 @@ class TaskTypeSelector extends ConsumerWidget {
   final TaskStatus taskStatus;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lightMode = !ref.read(themeState).darkMode;
     final taskOptionSelection =
         ref.read(tasksProjectState.select((value) => value.selectedStatus));
+    final selectedColor = lightMode
+        ? selectedTaskStatusBg
+        : const Color.fromARGB(255, 61, 61, 61);
+    final unselectedColor =
+        lightMode ? unselectedTaskStatusBg : Color.fromARGB(246, 43, 40, 40);
     print('REBUILD TASK SELECTOROOO');
     return Expanded(
       child: GestureDetector(
@@ -76,13 +85,18 @@ class TaskTypeSelector extends ConsumerWidget {
           child: Container(
             height: 44,
             color: taskOptionSelection == taskStatus
-                ? Color.fromARGB(255, 61, 61, 61)
-                : Color.fromARGB(246, 43, 40, 40),
+                ? selectedColor
+                : unselectedColor,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 icon,
-                AutoSizeText(text),
+                AutoSizeText(
+                  text,
+                  style: lightMode
+                      ? Theme.of(context).textTheme.labelMedium
+                      : null,
+                ),
                 const SizedBox(
                   width: 25,
                 )

@@ -3,34 +3,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/core/enums/main_option_enum.dart';
 import 'package:task_manager/provider/main_option_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/views/features/lateral_bar/lateral_bar.dart';
 import 'package:task_manager/views/features/project_page/project_page.dart';
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = ref.watch(themeState.select((value) => value.darkMode));
     return ContextMenuOverlay(
       child: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                tileMode: TileMode.decal,
-                colors: [
-                  Color.fromARGB(255, 15, 15, 15),
-                  Color.fromARGB(245, 0, 0, 0),
-                  Color.fromARGB(255, 22, 21, 21),
-                  Color.fromARGB(255, 63, 62, 62)
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight)),
+        decoration: !darkMode
+            ? null
+            : const BoxDecoration(
+                gradient: LinearGradient(
+                    tileMode: TileMode.decal,
+                    colors: [
+                      Color.fromARGB(255, 15, 15, 15),
+                      Color.fromARGB(245, 0, 0, 0),
+                      Color.fromARGB(255, 22, 21, 21),
+                      Color.fromARGB(255, 63, 62, 62)
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight)),
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: !darkMode ? null : Colors.transparent,
           body: Column(
             children: [
               Row(
                 children: [
-                  const LateralBar(),
+                  LateralBar(darkMode: darkMode,),
                   Expanded(child: Consumer(builder: (ctx, ref, _) {
                     final mainOption = ref.watch(mainOptionState);
 

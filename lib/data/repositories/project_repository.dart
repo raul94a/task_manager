@@ -21,10 +21,12 @@ class ProjectRepository {
   Future<List<Project>> getAll() async {
     try {
       final connection = MySQLManager.instance.conn!;
+        
       final rows = (await connection
-              .execute('SELECT * FROM projects where active is TRUE'))
+              .execute('select * from projects where active is TRUE'))
           .rows
           .toList();
+          print('ROWS: $rows');
       return rows.map((e) => Project.fromMap(e.typedAssoc())).toList();
     } catch (ex) {
       rethrow;

@@ -7,6 +7,7 @@ import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/project_bloc.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/select_tasks_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 import 'package:task_manager/provider/timer_stream.provider.dart';
 import 'package:task_manager/views/features/lateral_bar/secondary_app_option/dialogs/add_task_dialog.dart';
@@ -100,13 +101,14 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
 
   @override
   Widget build(BuildContext context) {
+    final lightMode = !ref.read(themeState).darkMode;
     return GestureDetector(
       onTap: () {
         print('tap on ${widget.project.name}');
         final tasksProjectBloc = TasksProjectBloc(ref: ref);
         tasksProjectBloc.getByProject(widget.project.id);
 
-         final timerStreamState = ref.read(timerStreamProvider);
+        final timerStreamState = ref.read(timerStreamProvider);
         final timerProvider = ref.watch(timerState);
 
         if ((timerStreamState.subscription != null &&
@@ -120,12 +122,11 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
             .update((state) => state.copyWith(taskId: null));
         ref.read(timerState.notifier).update((state) => state.clearTask());
       },
-      
       child: AnimatedBuilder(
         animation: controller,
         builder: (ctx, _) => Container(
           color: isTextHovered
-              ? Color.fromARGB(opacityAnimation.value.toInt(), 1, 1,1)
+              ? Color.fromARGB(opacityAnimation.value.toInt(), 1, 1, 1)
               : Colors.transparent,
           key: widget.key,
           padding: const EdgeInsets.all(8.0),
@@ -161,7 +162,6 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
                                       project: widget.project
                                           .copyWith(name: nameController.text));
                               disableEdit();
-                            
                             },
                             icon: const Icon(Icons.check))
                       ],
@@ -174,6 +174,9 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
                       maxLines: 2,
                       group: AutoSizeGroup(),
                       overflow: TextOverflow.fade,
+                      style: lightMode
+                          ? Theme.of(context).textTheme.labelMedium
+                          : null,
                     ),
                   ),
                 ),
@@ -183,11 +186,15 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
                     contextMenu: const Center(),
                     child: IconButton(
                         onPressed: () {
-                          context.contextMenuOverlay.show(_ContextMenuProjectTask(
-                              project: widget.project,
-                              enableEditHandler: enableEdit));
+                          context.contextMenuOverlay.show(
+                              _ContextMenuProjectTask(
+                                  project: widget.project,
+                                  enableEditHandler: enableEdit));
                         },
-                        icon: const Icon(Icons.more_horiz_outlined)),
+                        icon: Icon(
+                          Icons.more_horiz_outlined,
+                          color: lightMode ? Colors.white : null,
+                        )),
                   ),
                 )
               ],

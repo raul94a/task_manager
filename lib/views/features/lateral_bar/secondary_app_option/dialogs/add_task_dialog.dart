@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
@@ -53,8 +54,8 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
               children: [
                 Center(
                     child: Text(
-                  'Añadir tarea al projecto ${widget.project.name}',
-                  style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),
+                  'Añadir tarea al proyecto ${widget.project.name}',
+                  style: TextStyle(fontSize: 28,fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 )),
                 const SizedBox(
@@ -80,7 +81,7 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
                               }
                               return null;
                             },
-                            decoration: getDecoration(),
+                           // decoration: getDecoration(),
                           ),
                         ],
                       ),
@@ -105,7 +106,7 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
                               }
                               return null;
                             },
-                            decoration: getDecoration(),
+                           // decoration: getDecoration(),
                           ),
                         ],
                       ),
@@ -117,16 +118,21 @@ class _AddTaskState extends ConsumerState<AddTaskDialog> {
                 ),
                 Text('Descripción'),
                 
-                TextFormField(
-                  maxLines: 15,
-                  controller: descriptionController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'La descripción no puede estar vacía';
-                    }
-                    return null;
-                  },
-                  decoration: getDecoration(),
+                Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(image: Svg('assets/taskbg.svg',color: Color.fromARGB(255, 255, 244, 147)))
+                ),
+                  child: TextFormField(
+                    maxLines: 15,
+                    controller: descriptionController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'La descripción no puede estar vacía';
+                      }
+                      return null;
+                    },
+                    //decoration: getDecoration(),
+                  ),
                 ),
                 const SizedBox(
                   height: 20,

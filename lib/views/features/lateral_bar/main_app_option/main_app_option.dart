@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_manager/core/enums/main_option_enum.dart';
 import 'package:task_manager/logic/main_option_bloc.dart';
 import 'package:task_manager/provider/main_option_provider.dart';
@@ -47,11 +48,13 @@ class MainOptionItem extends ConsumerWidget {
         },
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 15),
+        
           child: Column(
             children: [
-              Icon(
-                iconDataByIndex[index],
-                size: 60,
+              SvgPicture.asset(
+                iconDataByIndex[index]!,
+                width: 50,
+                height: 50,
                 color: isSelected ? selecdtedColor : Colors.white,
               ),
               const SizedBox(
@@ -69,10 +72,10 @@ class MainOptionItem extends ConsumerWidget {
     );
   }
 
-  static const Map<int, IconData> iconDataByIndex = {
-    0: Icons.blender,
-    1: Icons.graphic_eq,
-    2: Icons.settings
+  static const Map<int, String> iconDataByIndex = {
+    0: 'assets/project.svg',
+    1: 'assets/stats.svg',
+    2: 'assets/settings.svg'
   };
 
   static const Map<String, MainOption> options = {

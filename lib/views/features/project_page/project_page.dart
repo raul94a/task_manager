@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:task_manager/core/extensions/context_extension.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
@@ -17,6 +18,10 @@ class ProjectPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final projects = ref.read(projectsState).projects;
+    if(projects.isEmpty){
+      return const Center(child: Text('No hay proyectos'),);
+    }
     final taskProjectState = ref.watch(tasksProjectState);
     print('Rebuilding Project Page');
     final project = ref
@@ -55,9 +60,9 @@ class ProjectPage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      AutoSizeText('Proyecto ${projectTask.name}'),
+                      AutoSizeText('Proyecto ${projectTask.name}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 23)),
                       if (task != null)
-                        AutoSizeText('Cronometrando la tarea ${task.name}')
+                        AutoSizeText('Cronometrando la tarea ${task.name}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 32)),
                     ]);
               }),
               const TaskTimer()
@@ -86,7 +91,7 @@ class _NoTasksForProject extends ConsumerWidget {
   static const double svgSize = 125.0;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final width = MediaQuery.of(context).size.width;
+    final width = context.width;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -101,11 +106,11 @@ class _NoTasksForProject extends ConsumerWidget {
               height: 50,
             ),
             Container(
-              //padding: EdgeInsets.all(6.0),
-
-              height: 200,
+              
+              padding: const EdgeInsets.all(25),
+             
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 39, 39, 39),
+                color: const Color.fromARGB(255, 39, 39, 39),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               width: width * 0.2,
@@ -125,9 +130,9 @@ class _NoTasksForProject extends ConsumerWidget {
                     ElevatedButton(
                         style: ButtonStyle(
                             fixedSize: MaterialStateProperty.resolveWith(
-                                (states) => Size(115, 35)),
+                                (states) => Size(context.width * 0.2 *0.95, 35)),
                             backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => Color.fromARGB(255, 63, 63, 63))),
+                                (states) => const Color.fromARGB(255, 63, 63, 63))),
                         onPressed: () {
                           //TODO!
                           showDialog(

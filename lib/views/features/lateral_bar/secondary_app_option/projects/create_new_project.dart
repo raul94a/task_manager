@@ -12,13 +12,14 @@ class CreateNewProject extends StatefulWidget {
 }
 
 class _CreateNewProjectState extends State<CreateNewProject> {
-   void _createProjectDialog(BuildContext context) {
+  void _createProjectDialog(BuildContext context) {
     showDialog(
         context: context,
         builder: (ctx) {
           return const CreateProjectDialog();
         });
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,17 +42,16 @@ class _CreateNewProjectState extends State<CreateNewProject> {
               overflow: TextOverflow.fade,
             ),
           ),
-          IconButton(
-              onPressed: () => _createProjectDialog(context),
-              icon: const Icon(Icons.add))
+          Expanded(
+            child: IconButton(
+                onPressed: () => _createProjectDialog(context),
+                icon: const Icon(Icons.add)),
+          )
         ],
       ),
     );
   }
 }
-
-
-
 
 class CreateProjectDialog extends ConsumerStatefulWidget {
   const CreateProjectDialog({
@@ -81,8 +81,11 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 7.0),
       title: const Text('Introduce el nombre del nuevo proyecto'),
+      content: SizedBox(width: size.width * 0.35),
       actions: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,17 +99,6 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
                 validator: validator,
                 controller: controller,
                 onChanged: onChanged,
-                decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Color.fromARGB(192, 219, 221, 221),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black)),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.lightBlue),
-                    ),
-                    errorMaxLines: 2,
-                    errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red))),
               ),
             )),
             const SizedBox(
@@ -117,7 +109,9 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
                   fixedSize: getProperty(const Size(120, 50)),
                 ),
                 onPressed: !buttonEnabled ? null : _createProject,
-                child: Text('Crear'))
+                child: Text(
+                  'Crear',
+                ))
           ],
         )
       ],

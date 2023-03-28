@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_manager/core/extensions/seconds_to_timer_extension.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/repositories/task_repository.dart';
@@ -87,10 +88,10 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
             const SizedBox(
               height: 10,
             ),
-            const Icon(
-              Icons.timer,
-             color: Colors.white,
-              size: 90,
+            SvgPicture.asset(
+              'assets/timer.svg',
+              color: Colors.white,
+              width: 90,
             ),
             if (!mTimerState.timerRunning)
               AutoSizeText(
@@ -177,8 +178,12 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                           TimerBloc(ref: ref).addSeconds(seconds: task.seconds);
                           TimerBloc(ref: ref).pauseRun();
                           TaskRepository().update(task);
-                          ref.read(timerState.notifier).state = TimerStateProvider(task: null,timerRunning: false);
-                          ref.read(selectTaskState.notifier).update((state) => state.copyWith(taskId: null));
+                          ref.read(timerState.notifier).state =
+                              TimerStateProvider(
+                                  task: null, timerRunning: false);
+                          ref
+                              .read(selectTaskState.notifier)
+                              .update((state) => state.copyWith(taskId: null));
                         },
                         icon: const Icon(
                           Icons.stop,

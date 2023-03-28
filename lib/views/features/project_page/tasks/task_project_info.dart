@@ -155,7 +155,8 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                                   TaskStatus.Pending.status &&
                               !editMode),
                           child: Radio(
-                            fillColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                              fillColor: MaterialStateProperty.resolveWith(
+                                  (states) => Colors.white),
                               value: widget.task.id,
                               groupValue: selectTaskStateProvider.taskId,
                               onChanged: onSelectTask),
@@ -426,12 +427,15 @@ class _AbandonButton extends StatelessWidget {
   final Task task;
   @override
   Widget build(BuildContext context) {
+    final color = task.status == TaskStatus.Abandoned.status
+        ? const Color.fromARGB(255, 83, 83, 83)
+        : const Color.fromARGB(255, 180, 80, 67);
     return Visibility(
       visible: task.status != TaskStatus.Completed.status,
       child: ElevatedButton(
           style: ButtonStyle(
-              fixedSize: getProperty(Size(115, 35)),
-              backgroundColor: getProperty(Color.fromARGB(255, 180, 80, 67))),
+              fixedSize: getProperty(const Size(115, 35)),
+              backgroundColor: getProperty(color)),
           onPressed: onPressed,
           child: Text(task.status == TaskStatus.Abandoned.status
               ? 'Reactivar'

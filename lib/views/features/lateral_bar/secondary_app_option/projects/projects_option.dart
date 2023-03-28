@@ -167,12 +167,14 @@ class _ProjectTaskOptionState extends ConsumerState<_ProjectTaskOption>
                       ],
                     ),
                   ),
-                  child: AutoSizeText(
-                    widget.project.name,
-                    minFontSize: 8,
-                    maxLines: 2,
-                    group: AutoSizeGroup(),
-                    overflow: TextOverflow.fade,
+                  child: Expanded(
+                    child: AutoSizeText(
+                      widget.project.name,
+                      minFontSize: 8,
+                      maxLines: 2,
+                      group: AutoSizeGroup(),
+                      overflow: TextOverflow.fade,
+                    ),
                   ),
                 ),
                 Visibility(

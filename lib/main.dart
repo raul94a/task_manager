@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mysql_manager/mysql_manager.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/project_bloc.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
@@ -11,10 +14,60 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Init db connection
   bool error = false;
+  final config = <String, String>{};
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    print('Starting on Desktop!!!!');
+    //how?
+    final directory = await getApplicationSupportDirectory();
+    String envFileDocument = directory.path + path.separator + '.env';
+    File env = File(envFileDocument);
+    if (await env.exists()) {
+      print(envFileDocument);
+      List<String> lines = env.readAsLinesSync();
+      for (final line in lines) {
+        final keyValue = line.split('=');
+        config.addAll({keyValue.first: keyValue.last});
+      }
+    } else {
+      print(envFileDocument);
+      await File(envFileDocument).writeAsString('''
+db=task_manager
+host=localhost
+user=root
+password=root
+port=3306''');
+    }
+  }
   try {
-    await MySQLManager.instance.init();
+    await MySQLManager.instance.init(false, config);
+//     MySQLManager.instance.conn?.execute('''
+
+// CREATE DATABASE IF NOT EXISTS task_manager;
+// use task_manager;
+// CREATE TABLE IF NOT EXISTS projects (
+//     id varchar(255) PRIMARY KEY,
+//     name VARCHAR(255) NOT NULL,
+//     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+//     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+// );
+
+// CREATE TABLE IF NOT EXISTS tasks (
+//     id varchar(255) PRIMARY KEY,
+//     name VARCHAR(255) NOT NULL,
+//     category VARCHAR(255),
+//     project_id varchar(255) NOT NULL,
+//     time_in_millis BIGINT NULL DEFAULT NULL ,
+//     status VARCHAR(255) NOT NULL DEFAULT "PENDING",
+//     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+//     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+//     FOREIGN KEY (project_id) REFERENCES projects(id)
+// );
+
+// ALTER TABLE tasks ADD COLUMN description TEXT(6000) NULL;
+// ALTER TABLE projects ADD COLUMN active TINYINT DEFAULT 1;
+//  ''');
   } catch (exception) {
-    print('Error estableciendo la conexión con la base de datos');
+    print('Error estableciendo la conexión con la base de datos $exception');
     error = true;
   }
   runApp(ProviderScope(child: MainApp(error: error)));
@@ -27,36 +80,66 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     print('Error: $error');
+    final controller = TextEditingController(
+      text:
+          'db=task_manager\nhost=localhost\nuser=root\npassword=root\nport=3306',
+    );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        dialogTheme: DialogTheme(
-          backgroundColor:    Color.fromARGB(255, 22, 21, 21),
+        textSelectionTheme: const TextSelectionThemeData(
+            cursorColor: Color.fromARGB(255, 238, 225, 225),
+            selectionColor: Colors.pink),
+        // dialogBackgroundColor:Color.fromARGB(255, 51, 50, 50),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith(
+                    (states) => const Color.fromARGB(255, 63, 63, 63)))),
+        dialogTheme: const DialogTheme(
+          backgroundColor: Color.fromARGB(255, 44, 44, 44),
         ),
         inputDecorationTheme: const InputDecorationTheme(
-          
+          errorMaxLines: 2,
+          fillColor: Color.fromARGB(246, 56, 56, 56),
+          filled: true,
           labelStyle: TextStyle(color: Colors.black, fontSize: 14.2),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: Color.fromARGB(255, 240, 240, 240), width: 0.75),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 0.75),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: Color.fromARGB(255, 240, 240, 240), width: 0.75),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: Color.fromARGB(255, 240, 240, 240), width: 0.75),
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        textTheme:  const TextTheme(
+        textTheme: const TextTheme(
           displayLarge: TextStyle(color: Colors.white),
           displayMedium: TextStyle(color: Colors.white),
           displaySmall: TextStyle(color: Colors.white),
-          bodySmall: TextStyle(color: Colors.white),
+
           labelMedium: TextStyle(color: Colors.black, fontSize: 14.2),
           labelLarge: TextStyle(color: Colors.white),
+
+          labelSmall: TextStyle(color: Colors.white),
+          bodyLarge: TextStyle(color: Colors.white),
           //TEXT
           bodyMedium: TextStyle(
               color: Color.fromARGB(255, 240, 239, 239), fontSize: 14.2),
-          labelSmall: TextStyle(color: Colors.white),
-          bodyLarge: TextStyle(color: Colors.white),
+          bodySmall: TextStyle(color: Colors.white),
           headlineSmall: TextStyle(color: Colors.black, fontSize: 14.2),
           headlineMedium: TextStyle(color: Colors.black, fontSize: 14.2),
           headlineLarge: TextStyle(color: Colors.black, fontSize: 14.2),
-          titleLarge: TextStyle(color: Colors.black, fontSize: 14.2),
-          titleMedium: TextStyle(color: Colors.black, fontSize: 14.2),
+          titleLarge: TextStyle(color: Colors.white, fontSize: 14.2),
+          titleMedium: TextStyle(color: Colors.white, fontSize: 14.2),
           titleSmall: TextStyle(color: Colors.black, fontSize: 14.2),
-         
         ),
       ),
       home: Scaffold(
@@ -65,9 +148,22 @@ class MainApp extends ConsumerWidget {
               replacement: Center(
                 child: Column(
                   children: [
-                    const Text('Ha ocurrido un error'),
+                    const Text('La conexión con la base de datos ha fallado'),
+                    TextFormField(
+                      controller: controller,
+                      maxLines: 6,
+                      decoration: InputDecoration(hintText: ''),
+                    ),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final directory =
+                              await getApplicationSupportDirectory();
+                          String envFileDocument =
+                              directory.path + path.separator + '.env';
+                          File(envFileDocument)
+                              .writeAsStringSync(controller.text);
+                          main();
+                        },
                         icon: const Icon(
                           Icons.error,
                           color: Colors.red,
@@ -102,6 +198,7 @@ class _InitAppState extends ConsumerState<InitApp> {
         });
         return <Project>[];
       }).then((projects) {
+        print('Projects: $projects');
         if (projects.isNotEmpty) {
           print(projects);
           final project = projects.first;
@@ -111,7 +208,10 @@ class _InitAppState extends ConsumerState<InitApp> {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const App()));
           });
-        }
+       }else{
+          Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const App()));
+       }
       });
     } catch (ex) {
       print('HA OCURRIDO UNA EXP');
@@ -136,7 +236,7 @@ class _InitAppState extends ConsumerState<InitApp> {
           children: [
             const Text('Ha ocurrido un error'),
             IconButton(
-                onPressed: () {
+                onPressed: () async {
                   main();
                 },
                 icon: const Icon(

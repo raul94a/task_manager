@@ -7,8 +7,11 @@ environment:
   sdk: '>=2.19.2 <3.0.0'
 
 dependencies:
+  path:
+  path_provider:
   intl:
-  flutter_svg: ^2.0.4
+  flutter_svg: ^1.0.1
+  flutter_svg_provider: ^1.0.0
   responsive_builder: ^0.6.4
   auto_size_text: ^3.0.0
   context_menus: ^1.0.2

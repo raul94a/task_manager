@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/views/features/project_page/tasks/task_project_info.dart';
+import 'package:task_manager/views/styles/gradients.dart';
 
 class TaskList extends StatelessWidget {
   const TaskList({super.key, required this.tasks, required this.projectPageRef,required this.lightMode});
@@ -16,7 +17,8 @@ class TaskList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6.0),
         decoration: BoxDecoration(
-          color: lightMode ? Colors.white : null
+          // color: lightMode ? Colors.white : null
+          gradient: lightMode ? lightModeGradient: null
         ),
         child: Visibility(
           replacement: const Center(child: Text('No hay tareas que mostrar')),

@@ -1,12 +1,15 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:task_manager/core/extensions/context_extension.dart';
+import 'package:task_manager/core/extensions/ref_extensions.dart';
 import 'package:task_manager/core/mixins/material_state_property_mixin.dart';
 import 'package:task_manager/logic/project_bloc.dart';
 import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
 import 'package:task_manager/provider/theme_provider.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 class CreateNewProject extends StatefulWidget {
   const CreateNewProject({super.key, required this.secondaryContainerWidth});
@@ -52,10 +55,10 @@ class _CreateNewProjectState extends State<CreateNewProject> {
             ),
             Expanded(
               child: IconButton(
-                  onPressed: () => _createProjectDialog(context),
-                  icon: const Icon(Icons.add),color: !ref.read(themeState).darkMode
-                    ? Colors.white
-                    : null,),
+                onPressed: () => _createProjectDialog(context),
+                icon: const Icon(Icons.add),
+                color: !ref.read(themeState).darkMode ? Colors.white : null,
+              ),
             )
           ],
         ),
@@ -95,7 +98,11 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
     final size = MediaQuery.of(context).size;
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 7.0),
-      title: const Text('Introduce el nombre del nuevo proyecto'),
+      title: Text(
+        'Introduce el nombre del nuevo proyecto',
+        style: context.bodyMedium
+            ?.copyWith(color: ref.lightMode ? Colors.white : null),
+      ),
       content: SizedBox(width: size.width * 0.35),
       actions: [
         Row(
@@ -116,13 +123,19 @@ class _CreateProjectDialogState extends ConsumerState<CreateProjectDialog>
               width: 6,
             ),
             ElevatedButton(
-                style: ButtonStyle(
-                  fixedSize: getProperty(const Size(120, 50)),
-                ),
-                onPressed: !buttonEnabled ? null : _createProject,
-                child: Text(
-                  'Crear',
-                ))
+            
+              style: ButtonStyle(
+                fixedSize: getProperty(const Size(120, 50)),
+                                
+                backgroundColor: getProperty(ref.lightMode ? lateralBarBg:null ),
+              ),
+              onPressed: !buttonEnabled ? null : _createProject,
+              child: Text(
+                'Crear',
+                style: context.bodyMedium
+                    ?.copyWith(color: ref.lightMode ? Colors.white : null),
+              ),
+            )
           ],
         )
       ],

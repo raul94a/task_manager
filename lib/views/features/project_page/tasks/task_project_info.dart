@@ -140,8 +140,9 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
         decoration: BoxDecoration(
           border: darkMode ? null : Border.all(color: lateralBarBg),
           borderRadius: BorderRadius.circular(5.0),
-        color:
-            !darkMode ? Colors.white10 : const Color.fromARGB(246, 44, 44, 44),
+          color: !darkMode
+              ? Colors.white10
+              : const Color.fromARGB(246, 44, 44, 44),
         ),
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -168,8 +169,13 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                               !editMode),
                           child: Radio(
                               toggleable: true,
-                              fillColor: MaterialStateProperty.resolveWith(
-                                  (states) => Colors.white),
+                              fillColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (!ref.read(themeState).darkMode) {
+                                  return lateralBarBg;
+                                }
+                                return Colors.white;
+                              }),
                               value: widget.task.id,
                               groupValue: selectTaskStateProvider.taskId,
                               onChanged: onSelectTask),
@@ -180,8 +186,6 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                         if (editMode)
                           Expanded(
                             child: TextField(
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              decoration: getDecoration(),
                               focusNode: nameFocus,
                               controller: nameController,
                             ),
@@ -207,8 +211,6 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                             child: Visibility(
                               visible: !editMode,
                               replacement: TextField(
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                decoration: getDecoration(),
                                 focusNode: categoryFocus,
                                 controller: categoryController,
                               ),
@@ -238,6 +240,8 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                             return const Center();
                           }
 
+                          final lightMode = !ref.read(themeState).darkMode;
+
                           return Visibility(
                             visible:
                                 widget.task.status == TaskStatus.Pending.status,
@@ -247,6 +251,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                                 icon: Icon(
                                   editMode ? Icons.check : Icons.mode,
                                   size: 30,
+                                  color: lightMode ? lateralBarBg : null,
                                 )),
                           );
                         })
@@ -297,7 +302,6 @@ class TaskExtendedInfo extends ConsumerWidget {
         margin: const EdgeInsets.only(top: 3),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
-          color: lightMode ? Colors.white :const Color.fromARGB(246, 44, 44, 44),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -326,9 +330,9 @@ class TaskExtendedInfo extends ConsumerWidget {
                               height: 5.0,
                             ),
                             TextField(
-                              style: Theme.of(context).textTheme.bodyMedium,
+                             
                               maxLines: 15,
-                              decoration: getDecoration(),
+                    
                               controller: descriptionController,
                             ),
                           ],
@@ -370,7 +374,7 @@ class TaskExtendedInfo extends ConsumerWidget {
                                 width: 10,
                               ),
                               _FinishButton(
-                                lightMode: lightMode,
+                                  lightMode: lightMode,
                                   task: task,
                                   onPressed: () {
                                     final newStatus = task.status ==
@@ -455,7 +459,11 @@ class _AbandonButton extends StatelessWidget {
 }
 
 class _FinishButton extends StatelessWidget {
-  const _FinishButton({super.key, required this.task, required this.onPressed,required this.lightMode});
+  const _FinishButton(
+      {super.key,
+      required this.task,
+      required this.onPressed,
+      required this.lightMode});
   final VoidCallback onPressed;
   final Task task;
   final bool lightMode;
@@ -466,7 +474,9 @@ class _FinishButton extends StatelessWidget {
       child: ElevatedButton(
           style: ButtonStyle(
               fixedSize: getProperty(Size(115, 35)),
-              backgroundColor: getProperty(lightMode ? lateralBarBg : const Color.fromARGB(255, 83, 83, 83))),
+              backgroundColor: getProperty(lightMode
+                  ? lateralBarBg
+                  : const Color.fromARGB(255, 83, 83, 83))),
           onPressed: onPressed,
           child: Text(task.status == TaskStatus.Completed.status
               ? 'Reactivar'

@@ -11,6 +11,7 @@ import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/logic/timer_bloc.dart';
 import 'package:task_manager/provider/select_tasks_provider.dart';
 import 'package:task_manager/provider/task_project_provider.dart';
+import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/provider/timer_provider.dart';
 import 'package:task_manager/provider/timer_stream.provider.dart';
 import 'package:task_manager/provider/update_task_time_provider.dart';
@@ -61,6 +62,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
   Widget build(
     BuildContext context,
   ) {
+    final lightMode = !ref.read(themeState).darkMode;
     mTimerState = ref.watch(timerState);
     Task? task = mTimerState.task;
     print('tasks seconds: ${task?.seconds}');
@@ -94,10 +96,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
               width: 90,
             ),
             if (!mTimerState.timerRunning)
-              AutoSizeText(
-                task.seconds.toTimer(),
-                minFontSize: 21,
-              )
+              _Timer(data: task.seconds)
             else
               StreamBuilder<int>(
                   initialData: task.seconds,
@@ -106,31 +105,26 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                     // print(snapshot);
                     final data = snapshot.data;
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return AutoSizeText(
-                        data == null ? "00:00:00" : data.toTimer(),
-                        minFontSize: 21,
-                      );
+                      return _Timer(data: data);
                     }
                     if (data != null) {
                       Future.microtask(() {
                         final timeInMillis = data * 1000;
-                        final newTask = task!.copyWith(timeInMillis: timeInMillis);
+                        final newTask =
+                            task!.copyWith(timeInMillis: timeInMillis);
                         final updateTaskNotifier =
                             ref.read(updateTaskTimeState.notifier);
-                        updateTaskNotifier.update((state) => state.copyWith(
-                            task: newTask));
+                        updateTaskNotifier
+                            .update((state) => state.copyWith(task: newTask));
 
                         if (data % 10 == 0) {
-                        print('Updating task: $newTask');
+                          print('Updating task: $newTask');
                           TaskRepository().update(newTask);
                         }
                       });
                     }
 
-                    return AutoSizeText(
-                      data == null ? "00:00:00" : data.toTimer(),
-                      minFontSize: 21,
-                    );
+                    return _Timer(data: data);
                   }),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -154,8 +148,11 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                     })),
                 Consumer(builder: (ctx, ref, _) {
                   final timerProvider = ref.watch(timerState);
-                  if (timerProvider.timerRunning &&
-                      (task!.id == timerProvider.task!.id)) {
+                  final mSubscription =
+                      ref.read(timerStreamProvider).subscription;
+                  if ((timerProvider.timerRunning &&
+                          (task!.id == timerProvider.task!.id)) ||
+                      (mSubscription != null && mSubscription.isPaused)) {
                     return IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () async {
@@ -177,7 +174,7 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
                           } catch (ex) {
                             print(ex);
                           }
-                         
+
                           TimerBloc(ref: ref).pauseRun();
                           TaskRepository().update(task);
                           ref.read(timerState.notifier).state =
@@ -237,7 +234,6 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
     final timerState = ref.read(timerStreamProvider);
     timerState.subscription = getStream(from: secondsToStartStreaming).listen(
       (sec) {
-        
         controller.sink.add(sec);
       },
       onDone: () {
@@ -247,5 +243,24 @@ class _TaskTimerState extends ConsumerState<TaskTimer> {
     );
     subscription = timerState.subscription;
     TimerBloc(ref: ref).startRun();
+  }
+}
+
+class _Timer extends StatelessWidget {
+  const _Timer({
+    super.key,
+    required this.data,
+  });
+
+  final int? data;
+
+  @override
+  Widget build(BuildContext context) {
+    return AutoSizeText(
+      data == null ? "00:00:00" : data!.toTimer(),
+      minFontSize: 21,
+      style:
+          Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+    );
   }
 }

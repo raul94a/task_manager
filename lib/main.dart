@@ -11,6 +11,7 @@ import 'package:task_manager/logic/tasks_project_bloc.dart';
 import 'package:task_manager/provider/project_provider.dart';
 import 'package:task_manager/provider/theme_provider.dart';
 import 'package:task_manager/views/app.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,14 +31,38 @@ class MainApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     print('Error: $error');
     final controller = TextEditingController(
-      text:
-          'db=task_manager\nhost=localhost\nuser=root\npassword=root\nport=3306',
+      text: 'db=mysql\nhost=localhost\nuser=root\npassword=root\nport=3306',
     );
     final darkMode = ref.watch(themeState.select((value) => value.darkMode));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: !darkMode
           ? ThemeData.light().copyWith(
+              inputDecorationTheme: const InputDecorationTheme(
+                errorMaxLines: 2,
+                fillColor: lateralBarBg,
+                filled: true,
+                labelStyle: TextStyle(color: Colors.black, fontSize: 14.2),
+                                errorStyle: TextStyle(color: Colors.red, fontSize: 14.2),
+
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 233, 17, 17), width: 0.75),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red, width: 0.75),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 240, 240, 240), width: 0.75),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 240, 240, 240), width: 0.75),
+                ),
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
+              dialogBackgroundColor: taskDialogLightModeBg,
               textTheme: const TextTheme(
                 displayLarge: TextStyle(color: Colors.black),
                 displayMedium: TextStyle(color: Colors.black),
@@ -49,14 +74,13 @@ class MainApp extends ConsumerWidget {
                 labelSmall: TextStyle(color: Colors.black),
                 bodyLarge: TextStyle(color: Colors.black),
                 //TEXT
-                bodyMedium: TextStyle(
-                    color: Colors.black, fontSize: 14.2),
+                bodyMedium: TextStyle(color: Colors.black, fontSize: 14.2),
                 bodySmall: TextStyle(color: Colors.black),
                 headlineSmall: TextStyle(color: Colors.white, fontSize: 14.2),
                 headlineMedium: TextStyle(color: Colors.white, fontSize: 14.2),
                 headlineLarge: TextStyle(color: Colors.white, fontSize: 14.2),
                 titleLarge: TextStyle(color: Colors.black, fontSize: 14.2),
-                titleMedium: TextStyle(color: Colors.black, fontSize: 14.2),
+                titleMedium: TextStyle(color: Colors.white, fontSize: 14.2),
                 titleSmall: TextStyle(color: Colors.white, fontSize: 14.2),
               ),
             )
@@ -77,6 +101,7 @@ class MainApp extends ConsumerWidget {
                 fillColor: Color.fromARGB(246, 56, 56, 56),
                 filled: true,
                 labelStyle: TextStyle(color: Colors.black, fontSize: 14.2),
+                errorStyle: TextStyle(color: Colors.red, fontSize: 14.2),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                       color: Color.fromARGB(255, 240, 240, 240), width: 0.75),

@@ -216,14 +216,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.27"
-  mysql_manager:
+  mysql_manager_flutter:
     dependency: "direct main"
     description:
-      name: mysql_manager
-      sha256: "1bbf844c593fae511d624b7d1bc5f524f3d1bb92f819fa3d97baba78f9de0223"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
+      path: "."
+      ref: HEAD
+      resolved-ref: "2306af705ce958474ae5b16ab264b102ad7f43aa"
+      url: "https://github.com/raul94a/mysql_manager_flutter"
+    source: git
+    version: "0.1.2"
   nested:
     dependency: transitive
     description:

@@ -1,4 +1,4 @@
-import 'package:mysql_manager/mysql_manager.dart';
+import 'package:mysql_manager_flutter/mysql_manager_flutter.dart';
 import 'package:task_manager/data/models/project_model.dart';
 
 class ProjectRepository {

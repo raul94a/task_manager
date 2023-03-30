@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_manager/core/enums/main_option_enum.dart';
+import 'package:task_manager/core/extensions/ref_extensions.dart';
 import 'package:task_manager/logic/main_option_bloc.dart';
 import 'package:task_manager/provider/main_option_provider.dart';
 import 'package:task_manager/provider/theme_provider.dart';
@@ -14,7 +15,44 @@ class MainAppOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: List.generate(3, (index) => MainOptionItem(index: index)),
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: List.generate(3, (index) => MainOptionItem(index: index)),
+        ),
+        const _SwitchThemeButton()
+      ],
+    );
+  }
+}
+
+class _SwitchThemeButton extends ConsumerWidget {
+  const _SwitchThemeButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5.0),
+        child: Center(
+          child: GestureDetector(
+              onTap: () => ref
+                  .read(themeState.notifier)
+                  .update((state) => state.copyWith(darkMode: !state.darkMode)),
+              child: ref.lightMode
+                  ? const Icon(
+                      Icons.dark_mode,
+                      size: 50,
+                    )
+                  : const Icon(
+                      Icons.light_mode,
+                      size: 50,
+                    )),
+        ),
+      ),
     );
   }
 }
@@ -40,7 +78,9 @@ class MainOptionItem extends ConsumerWidget {
         break;
     }
     final darkMode = ref.read(themeState).darkMode;
-    final selecdtedColor =  darkMode ? Color.fromARGB(255, 230, 168, 192) : Color.fromARGB(255, 240, 228, 123);
+    final selecdtedColor = darkMode
+        ? const Color.fromARGB(255, 230, 168, 192)
+        : const Color.fromARGB(255, 240, 228, 123);
     const unselectedColor = Colors.white;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -48,13 +88,10 @@ class MainOptionItem extends ConsumerWidget {
         onTap: () {
           final mainOptBloc = MainOptionBloc(ref: ref);
           mainOptBloc.changeOption(option: mainOptionsByIndex[index]!);
-          if(index == 2){
-            ref.read(themeState.notifier).update((state) => ThemeState(darkMode: !state.darkMode));
-          }
+         
         },
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 15),
-        
           child: Column(
             children: [
               SvgPicture.asset(

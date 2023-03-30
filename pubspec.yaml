@@ -15,7 +15,10 @@ dependencies:
   responsive_builder: ^0.6.4
   auto_size_text: ^3.0.0
   context_menus: ^1.0.2
-  mysql_manager: ^1.1.0
+  mysql_manager_flutter:
+    git: 
+      url: https://github.com/raul94a/mysql_manager_flutter
+  # mysql_manager: ^1.1.0
   uuid: ^3.0.7
   flutter_riverpod:
   flutter:

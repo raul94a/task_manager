@@ -69,21 +69,55 @@ class ProjectPage extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AutoSizeText('Proyecto ${projectTask.name}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                  fontSize: 23,
-                                  color: lightMode ? Colors.white : null)),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                  onTap: () => showDialog(
+                                      context: context,
+                                      builder: (_) =>
+                                          AddTaskDialog(project: project)),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Añadir una tarea',
+                                        style: context.bodyMedium?.copyWith(
+                                            color: ref.lightMode
+                                                ? Colors.white
+                                                : null),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const Icon(Icons.add)
+                                    ],
+                                  ))),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          AutoSizeText('Proyecto ${projectTask.name}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontSize: 23,
+                                      color: lightMode ? Colors.white : null)),
+                        ],
+                      ),
                       if (task != null)
-                        AutoSizeText('Cronometrando la tarea ${task.name}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontSize: 32,
-                                    color: lightMode ? Colors.white : null)),
+                        SizedBox(
+                          width: context.width * 0.4,
+                          child: AutoSizeText(task.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontSize: 28,
+                                      color: lightMode ? Colors.white : null)),
+                        ),
                       const SizedBox(
                         height: 15,
                       ),
@@ -93,21 +127,21 @@ class ProjectPage extends ConsumerWidget {
                           if (streamState.subscription == null) {
                             return Text(
                               'Estado: cronómetro parado.',
-                              style: context.bodyMedium
-                                    ?.copyWith(color: Colors.white,fontSize: 16.0),
+                              style: context.bodyMedium?.copyWith(
+                                  color: Colors.white, fontSize: 16.0),
                             );
                           } else if (streamState.subscription != null &&
                               streamState.subscription!.isPaused) {
                             return Text(
-                             'Estado: cronómetro pausado.',
-                              style: context.bodyMedium
-                                    ?.copyWith(color: Colors.white,fontSize: 16.0),
+                              'Estado: cronómetro pausado.',
+                              style: context.bodyMedium?.copyWith(
+                                  color: Colors.white, fontSize: 16.0),
                             );
                           } else {
                             return Text(
                               'Estado: cronómetro en marcha.',
-                              style: context.bodyMedium
-                                  ?.copyWith(color: Colors.white,fontSize: 16.0),
+                              style: context.bodyMedium?.copyWith(
+                                  color: Colors.white, fontSize: 16.0),
                             );
                           }
                         })
@@ -147,6 +181,8 @@ class _NoTasksForProject extends ConsumerWidget {
       children: [
         Column(
           children: [
+            Text(project.name,style:context.bodyMedium?.copyWith(fontSize: 34)),
+            const SizedBox(height: 20,),
             SvgPicture.asset(
               'assets/pin.svg',
               width: svgSize,
@@ -170,6 +206,7 @@ class _NoTasksForProject extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    
                     Text('Todavía no tienes ninguna tarea para este proyecto',
                         textAlign: TextAlign.center,
                         style: context.bodyMedium
@@ -192,7 +229,7 @@ class _NoTasksForProject extends ConsumerWidget {
                               context: context,
                               builder: (_) => AddTaskDialog(project: project));
                         },
-                        child: const Text('Añadir tarea'))
+                        child: Text('Añadir tarea'))
                   ],
                 ),
               ),

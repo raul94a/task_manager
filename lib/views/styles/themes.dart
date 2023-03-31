@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-final darkTheme = ThemeData(
+final darkTheme = ThemeData().copyWith(
   textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Color.fromARGB(255, 238, 225, 225),
       selectionColor: Colors.pink),

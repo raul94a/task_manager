@@ -191,9 +191,10 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                             ),
                           )
                         else
-                          AutoSizeText(widget.task.name),
+                          Expanded(child: AutoSizeText(widget.task.name,overflow: TextOverflow.ellipsis,maxLines: 2,)),
                       ],
                     )),
+                    const SizedBox(width: 5,),
                     Expanded(
                       flex: 1,
                       child: Row(

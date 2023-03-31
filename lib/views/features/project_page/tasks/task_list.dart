@@ -6,7 +6,11 @@ import 'package:task_manager/views/features/project_page/tasks/task_project_info
 import 'package:task_manager/views/styles/gradients.dart';
 
 class TaskList extends StatelessWidget {
-  const TaskList({super.key, required this.tasks, required this.projectPageRef,required this.lightMode});
+  const TaskList(
+      {super.key,
+      required this.tasks,
+      required this.projectPageRef,
+      required this.lightMode});
   final bool lightMode;
   final WidgetRef projectPageRef;
   final List<Task> tasks;
@@ -17,9 +21,8 @@ class TaskList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6.0),
         decoration: BoxDecoration(
-          // color: lightMode ? Colors.white : null
-          gradient: lightMode ? lightModeGradient: null
-        ),
+            // color: lightMode ? Colors.white : null
+            gradient: lightMode ? lightModeGradient : null),
         child: Visibility(
           replacement: const Center(child: Text('No hay tareas que mostrar')),
           visible: tasks.isNotEmpty,
@@ -46,6 +49,7 @@ class TaskList extends StatelessWidget {
                     );
                   },
                 ),
+                
               ],
             ),
           ),
@@ -67,7 +71,7 @@ class _TasksTableHeaders extends StatelessWidget {
       children: [
         Expanded(
             child: Container(
-          margin: const EdgeInsets.only(left:50),
+          margin: const EdgeInsets.only(left: 50),
           child: const AutoSizeText(
             'Nombre',
             textAlign: TextAlign.start,

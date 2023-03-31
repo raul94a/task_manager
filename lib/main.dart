@@ -1,7 +1,6 @@
 import 'package:mysql_manager_flutter/mysql_manager_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:task_manager/core/extensions/context_extension.dart';
 import 'package:task_manager/data/db/queries.dart';
 import 'package:task_manager/data/models/project_model.dart';
 import 'package:task_manager/logic/project_bloc.dart';
@@ -83,33 +82,20 @@ class _InitAppState extends ConsumerState<InitApp> {
   @override
   void initState() {
     super.initState();
-    try {
-      _fetchProjects();
-    } catch (ex) {
-      print('ha ocurrido una expceiton $ex');
-    }
+    Future.delayed(
+      const Duration(milliseconds: 1200),
+      (() {
+        try {
+          _fetchProjects();
+        } catch (ex) {
+          print('ha ocurrido una expceiton $ex');
+        }
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (error) {
-      return Center(
-        child: Column(
-          children: [
-            const Text('Ha ocurrido un error'),
-            IconButton(
-                onPressed: () async {
-                  main();
-                },
-                icon: const Icon(
-                  Icons.error,
-                  color: Colors.pink,
-                  size: 50,
-                )),
-          ],
-        ),
-      );
-    }
     return const CircularProgressIndicator();
   }
 }

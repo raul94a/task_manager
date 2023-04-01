@@ -19,7 +19,7 @@ class LateralBar extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 250, maxWidth: 450),
       decoration: BoxDecoration(
         border: const Border(
-          right: BorderSide(color: Colors.black, width: 5.5),
+          right: BorderSide(color: Colors.black, width: 1.5),
         ),
         color: !darkMode ? lateralBarBg : Color.fromARGB(246, 56, 56, 56),
       ),

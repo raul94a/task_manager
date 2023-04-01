@@ -141,7 +141,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
           border: darkMode ? null : Border.all(color: lateralBarBg),
           borderRadius: BorderRadius.circular(5.0),
           color: !darkMode
-              ? Colors.white10
+              ? selectedTaskStatusBg
               : const Color.fromARGB(246, 44, 44, 44),
         ),
         child: MouseRegion(
@@ -171,9 +171,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                               toggleable: true,
                               fillColor:
                                   MaterialStateProperty.resolveWith((states) {
-                                if (!ref.read(themeState).darkMode) {
-                                  return lateralBarBg;
-                                }
+                               
                                 return Colors.white;
                               }),
                               value: widget.task.id,
@@ -191,10 +189,17 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                             ),
                           )
                         else
-                          Expanded(child: AutoSizeText(widget.task.name,overflow: TextOverflow.ellipsis,maxLines: 2,)),
+                          Expanded(
+                              child: AutoSizeText(widget.task.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: context.bodyMedium
+                                      ?.copyWith(color: Colors.white))),
                       ],
                     )),
-                    const SizedBox(width: 5,),
+                    const SizedBox(
+                      width: 5,
+                    ),
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -224,24 +229,26 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                         ],
                       ),
                     ),
-                    const Expanded(
-                        child: AutoSizeText(
-                      'Raul',
-                      textAlign: TextAlign.start,
-                    )),
+                    Expanded(
+                        child: AutoSizeText('Raul',
+                            textAlign: TextAlign.start,
+                            style: context.bodyMedium
+                                ?.copyWith(color: Colors.white))),
                     Expanded(
                         child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AutoSizeText(widget.task.createdAt.toSpanishDate()),
-                        // const SizedBox(),
+                        AutoSizeText(widget.task.createdAt.toSpanishDate(),
+                            style: context.bodyMedium
+                                ?.copyWith(color: Colors.white)),
+                        
 
                         Consumer(builder: (context, ref, _) {
                           if (maybeHideEditButton(ref)) {
                             return const Center();
                           }
 
-                          final lightMode = !ref.read(themeState).darkMode;
+                         
 
                           return Visibility(
                             visible:
@@ -252,7 +259,7 @@ class _ProjectTaskInfoState extends ConsumerState<ProjectTaskInfo> {
                                 icon: Icon(
                                   editMode ? Icons.check : Icons.mode,
                                   size: 30,
-                                  color: lightMode ? lateralBarBg : null,
+                                  //color: lightMode ? lateralBarBg : null,
                                 )),
                           );
                         })
@@ -318,7 +325,9 @@ class TaskExtendedInfo extends ConsumerWidget {
                     if (!editMode)
                       Wrap(
                         direction: Axis.vertical,
-                        children: [Text('Descripción'), Text(task.description)],
+                        children: [Text('Descripción',
+                            style: context.bodyMedium?.copyWith(color: Colors.white)), Text(task.description,
+                            style: context.bodyMedium?.copyWith(color: Colors.white))],
                       )
                     else
                       Container(
@@ -326,14 +335,13 @@ class TaskExtendedInfo extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Descripción'),
+                            Text('Descripción',
+                            style: context.bodyMedium?.copyWith(color: Colors.white)),
                             const SizedBox(
                               height: 5.0,
                             ),
                             TextField(
-                             
                               maxLines: 15,
-                    
                               controller: descriptionController,
                             ),
                           ],
@@ -353,7 +361,8 @@ class TaskExtendedInfo extends ConsumerWidget {
                             dedicatedTime = updateTask.seconds;
                           }
                           return Text(
-                              'Tiempo dedicado: ${isTaskStarted ? dedicatedTime.toTime() : '-'}');
+                              'Tiempo dedicado: ${isTaskStarted ? dedicatedTime.toTime() : '-'}',
+                            style: context.bodyMedium?.copyWith(color: Colors.white));
                         }),
                         Visibility(
                           visible: !editMode,

@@ -39,10 +39,10 @@ class ProjectPage extends ConsumerWidget {
     }
     final size = MediaQuery.of(context).size;
     final height = size.height;
-
     final tasks = taskProjectState.getTasksBySelectedStatus();
     final tasksBloc = TasksProjectBloc(ref: ref);
     final lightMode = !ref.read(themeState).darkMode;
+
     return Container(
       color: lightMode ? lateralBarBg : null,
       height: height,
@@ -51,103 +51,90 @@ class ProjectPage extends ConsumerWidget {
           const SizedBox(
             height: 20,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          Stack(
             children: [
-              Consumer(builder: (context, ref, _) {
-                final task = ref.watch(timerState).task;
-                Project projectTask = project;
-                if (task != null) {
-                  projectTask = ref
-                      .read(projectsState)
-                      .getProjectById(projectId: task.projectId);
-                }
+              Positioned(
+                  left: 5, top: 0, child: _AddTaskButton(project: project)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Consumer(builder: (context, ref, _) {
+                    final task = ref.watch(timerState).task;
+                    Project projectTask = project;
+                    if (task != null) {
+                      projectTask = ref
+                          .read(projectsState)
+                          .getProjectById(projectId: task.projectId);
+                    }
 
-                return Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                    return Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                  onTap: () => showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          AddTaskDialog(project: project)),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        'Añadir una tarea',
-                                        style: context.bodyMedium?.copyWith(
-                                            color: ref.lightMode
-                                                ? Colors.white
-                                                : null),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      const Icon(Icons.add)
-                                    ],
-                                  ))),
-                          const SizedBox(
-                            height: 10,
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              AutoSizeText('Proyecto ${projectTask.name}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                          fontSize: 23,
+                                          color:
+                                              lightMode ? Colors.white : null)),
+                            ],
                           ),
-                          AutoSizeText('Proyecto ${projectTask.name}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                      fontSize: 23,
-                                      color: lightMode ? Colors.white : null)),
-                        ],
-                      ),
-                      if (task != null)
-                        SizedBox(
-                          width: context.width * 0.4,
-                          child: AutoSizeText(task.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                      fontSize: 28,
-                                      color: lightMode ? Colors.white : null)),
-                        ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      if (task != null)
-                        Consumer(builder: (ctx, ref, _) {
-                          final streamState = ref.watch(timerStreamProvider);
-                          if (streamState.subscription == null) {
-                            return Text(
-                              'Estado: cronómetro parado.',
-                              style: context.bodyMedium?.copyWith(
-                                  color: Colors.white, fontSize: 16.0),
-                            );
-                          } else if (streamState.subscription != null &&
-                              streamState.subscription!.isPaused) {
-                            return Text(
-                              'Estado: cronómetro pausado.',
-                              style: context.bodyMedium?.copyWith(
-                                  color: Colors.white, fontSize: 16.0),
-                            );
-                          } else {
-                            return Text(
-                              'Estado: cronómetro en marcha.',
-                              style: context.bodyMedium?.copyWith(
-                                  color: Colors.white, fontSize: 16.0),
-                            );
-                          }
-                        })
-                    ]);
-              }),
-              const TaskTimer()
+                          if (task != null)
+                            SizedBox(
+                              width: context.width * 0.4,
+                              child: AutoSizeText(task.name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                          fontSize: 28,
+                                          color:
+                                              lightMode ? Colors.white : null)),
+                            ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          if (task != null)
+                            Consumer(builder: (ctx, ref, _) {
+                              final streamState =
+                                  ref.watch(timerStreamProvider);
+                              if (streamState.subscription == null) {
+                                return Text(
+                                  'Estado: cronómetro parado.',
+                                  style: context.bodyMedium?.copyWith(
+                                      color: Colors.white, fontSize: 16.0),
+                                );
+                              } else if (streamState.subscription != null &&
+                                  streamState.subscription!.isPaused) {
+                                return Text(
+                                  'Estado: cronómetro pausado.',
+                                  style: context.bodyMedium?.copyWith(
+                                      color: Colors.white, fontSize: 16.0),
+                                );
+                              } else {
+                                return Text(
+                                  'Estado: cronómetro en marcha.',
+                                  style: context.bodyMedium?.copyWith(
+                                      color: Colors.white, fontSize: 16.0),
+                                );
+                              }
+                            })
+                        ]);
+                  }),
+                  const TaskTimer()
+                ],
+              ),
             ],
           ),
           const SizedBox(
@@ -160,6 +147,60 @@ class ProjectPage extends ConsumerWidget {
             projectPageRef: ref,
           )
         ],
+      ),
+    );
+  }
+}
+
+class _AddTaskButton extends ConsumerStatefulWidget {
+  const _AddTaskButton({
+    super.key,
+    required this.project,
+  });
+
+  final Project project;
+
+  @override
+  ConsumerState<_AddTaskButton> createState() => _AddTaskButtonState();
+}
+
+class _AddTaskButtonState extends ConsumerState<_AddTaskButton> {
+  late Color hoveredColor;
+  bool isHover = false;
+  late bool lightMode;
+  changeHoverStatus() => setState(() => isHover = !isHover);
+  @override
+  void initState() {
+    lightMode = ref.lightMode;
+    hoveredColor = lightMode ? lightSelectedMainOptionColor : darkSelectedMainOptionColor;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (event) {
+        changeHoverStatus();
+      },
+      onExit: (event) {
+        changeHoverStatus();
+      },
+      cursor: SystemMouseCursors.click,
+      child: Tooltip(
+        decoration: BoxDecoration(
+          color: !lightMode ? Colors.black : lateralBarBg
+        ),
+        message: 'Añadir tarea a ${widget.project.name}',
+        child: GestureDetector(
+          onTap: () => showDialog(
+              context: context,
+              builder: (_) => AddTaskDialog(project: widget.project)),
+          child: Icon(
+            Icons.add,
+            color: isHover ? hoveredColor : null,
+            size: 50,
+          ),
+        ),
       ),
     );
   }
@@ -181,8 +222,11 @@ class _NoTasksForProject extends ConsumerWidget {
       children: [
         Column(
           children: [
-            Text(project.name,style:context.bodyMedium?.copyWith(fontSize: 34)),
-            const SizedBox(height: 20,),
+            Text(project.name,
+                style: context.bodyMedium?.copyWith(fontSize: 34)),
+            const SizedBox(
+              height: 20,
+            ),
             SvgPicture.asset(
               'assets/pin.svg',
               width: svgSize,
@@ -200,13 +244,12 @@ class _NoTasksForProject extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               width: width * 0.2,
-              constraints: BoxConstraints(maxWidth: 800),
+              constraints: const BoxConstraints(maxWidth: 800),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    
                     Text('Todavía no tienes ninguna tarea para este proyecto',
                         textAlign: TextAlign.center,
                         style: context.bodyMedium
@@ -229,7 +272,7 @@ class _NoTasksForProject extends ConsumerWidget {
                               context: context,
                               builder: (_) => AddTaskDialog(project: project));
                         },
-                        child: Text('Añadir tarea'))
+                        child: const Text('Añadir tarea'))
                   ],
                 ),
               ),

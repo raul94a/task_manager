@@ -8,6 +8,7 @@ import 'package:task_manager/core/extensions/ref_extensions.dart';
 import 'package:task_manager/logic/main_option_bloc.dart';
 import 'package:task_manager/provider/main_option_provider.dart';
 import 'package:task_manager/provider/theme_provider.dart';
+import 'package:task_manager/views/styles/app_colors.dart';
 
 class MainAppOption extends StatelessWidget {
   const MainAppOption({super.key});
@@ -79,8 +80,8 @@ class MainOptionItem extends ConsumerWidget {
     }
     final darkMode = ref.read(themeState).darkMode;
     final selecdtedColor = darkMode
-        ? const Color.fromARGB(255, 230, 168, 192)
-        : const Color.fromARGB(255, 240, 228, 123);
+        ? darkSelectedMainOptionColor
+        : lightSelectedMainOptionColor;
     const unselectedColor = Colors.white;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
